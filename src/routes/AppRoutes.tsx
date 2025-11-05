@@ -13,7 +13,7 @@ import { LoginPage } from '../pages/store/LoginPage';
 import { RegisterPage } from '../pages/store/RegisterPage';
 import { AboutPage } from '../pages/store/AboutPage';
 import { BlogPage } from '../pages/store/BlogPage';
-import { BlogDetailPage } from '../pages/store/BlogDetailPage'; 
+import { BlogDetailPage } from '../pages/store/BlogDetailPage';
 import { ContactPage } from '../pages/store/ContactPage';
 
 // --- Importa el Layout y las páginas de ADMIN ---
@@ -25,7 +25,19 @@ import { AdminCategories } from '../pages/admin/AdminCategories';
 import { AdminUsers } from '../pages/admin/AdminUsers';
 import { AdminReportes } from '../pages/admin/AdminReportes';
 import { AdminProfile } from '../pages/admin/AdminProfile';
+// --- NUEVAS PÁGINAS DE ADMIN ---
+import { AdminProductCreate } from '../pages/admin/AdminProductCreate';
+import { AdminProductEdit } from '../pages/admin/AdminProductEdit';
 
+
+// --- Placeholders (solo los que no hemos construido) ---
+const PlaceholderPage = ({ title }: { title: string }) => (
+  <div className="text-white p-5 bg-dark min-vh-100">
+    <h1 className="text-white">{title}</h1>
+    <p>Esta página aún está en construcción.</p>
+  </div>
+);
+// --- Fin Placeholders ---
 
 
 export const AppRoutes = () => {
@@ -33,14 +45,11 @@ export const AppRoutes = () => {
         // --- Rutas públicas de la TIENDA ---
         { path: '/', element: <HomePage /> },
         { path: '/producto/:id', element: <ProductDetailPage /> },
-        
         { path: '/categorias', element: <CategoriesPage /> },
         { path: '/categoria/:categoryName', element: <ProductListPage /> }, 
-
-        { path: '/blog', element: <BlogPage /> }, // <--- 4. ACTUALIZADO
-        { path: '/blog/:slug', element: <BlogDetailPage /> }, // <--- 5. NUEVA RUTA
-        
-        { path: '/nosotros', element: <AboutPage /> }, // <--- 3. ACTUALIZADO
+        { path: '/nosotros', element: <AboutPage /> },
+        { path: '/blog', element: <BlogPage /> },
+        { path: '/blog/:slug', element: <BlogDetailPage /> },
         { path: '/contacto', element: <ContactPage /> },
         { path: '/login', element: <LoginPage /> },
         { path: '/registro', element: <RegisterPage /> },
@@ -48,7 +57,6 @@ export const AppRoutes = () => {
         { path: '/checkout', element: <CheckoutPage /> },
         { path: '/compra-exitosa/:orderId', element: <OrderSuccessPage /> },
         { path: '/compra-fallida', element: <OrderFailPage /> },
-        { path: '/contacto', element: <ContactPage /> },
 
         // --- Rutas privadas del ADMINISTRADOR ---
         {
@@ -56,7 +64,13 @@ export const AppRoutes = () => {
           element: <AdminLayout />,
           children: [
             { index: true, element: <AdminDashboard /> },
+            
+            // --- RUTAS DE PRODUCTOS (ACTUALIZADAS) ---
             { path: 'productos', element: <AdminProducts /> },
+            { path: 'productos/nuevo', element: <AdminProductCreate /> },
+            { path: 'productos/editar/:id', element: <AdminProductEdit /> },
+            
+            // --- Rutas placeholder ---
             { path: 'ordenes', element: <AdminOrders /> },
             { path: 'categorias', element: <AdminCategories /> },
             { path: 'usuarios', element: <AdminUsers /> },

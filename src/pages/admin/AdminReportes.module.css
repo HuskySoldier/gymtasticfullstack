@@ -1,0 +1,57 @@
+.statCard {
+  background-color: var(--gym-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: var(--gym-light);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+.statIcon {
+  font-size: 3rem;
+  margin-right: 1.5rem;
+  color: var(--gym-primary);
+  width: 60px;
+  text-align: center;
+}
+
+.statValue {
+  font-size: 2.5rem;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 1rem;
+  color: var(--gym-text-secondary);
+  text-transform: uppercase;
+}
+
+.reportSection {
+  background-color: var(--gym-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: var(--gym-light);
+}
+
+.reportHeader {
+  color: var(--gym-primary);
+  font-family: 'Oswald', sans-serif;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.downloadButton {
+  background: var(--gym-primary-gradient);
+  border: none;
+  color: var(--gym-dark);
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.downloadButton:hover {
+  color: var(--gym-dark);
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+}
