@@ -2,7 +2,6 @@
 // Los "Productos" pueden ser membresías, suplementos, ropa, etc.
 
 export interface Product {
-  imageUrl: string | undefined;
   id: number;
   name: string;
   description: string;
@@ -15,7 +14,8 @@ export interface Product {
 }
 
 // Interface para el item en el carrito
-export interface CartItem extends Product {
+export interface CartItem {
+  product: Product;
   quantity: number;
 }
 
@@ -31,4 +31,3 @@ export interface SingleProductResponse {
   statusCode: number;
   product?: Product;
 }
-

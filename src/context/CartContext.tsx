@@ -8,7 +8,7 @@ interface CartItem {
 }
 
 // Definimos lo que nuestro Contexto va a proveer
-interface CartContextType {
+export interface CartContextType {
   cart: CartItem[];
   addToCart: (product: Product, quantity: number) => void;
   removeFromCart: (productId: number) => void;

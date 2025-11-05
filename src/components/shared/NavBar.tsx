@@ -1,28 +1,29 @@
 import { Link, NavLink } from 'react-router-dom';
 import { Navbar, Container, Nav, Badge } from 'react-bootstrap';
-import { useCart } from '../../context/CartContext'; // Importamos nuestro hook
+import { useCart } from '../../context/CartContext'; 
 
 export const NavBar = () => {
-
   const { cart } = useCart();
-  
-  // Calculamos el total de items en el carrito
   const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-  
-  // Calculamos el precio total
   const totalPrice = cart.reduce((total, item) => total + (item.product.price * item.quantity), 0);
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" className="border-bottom border-secondary">
+    <Navbar 
+      bg="dark"      /* <-- CAMBIO: Fondo oscuro */
+      variant="dark"    /* <-- CAMBIO: Texto claro */
+      expand="lg" 
+      className="border-bottom border-secondary shadow-sm"
+      sticky="top"
+    >
       <Container>
-        <Navbar.Brand as={Link} to="/" className="fw-bold">
-          <i className="fa-solid fa-dumbbell me-2"></i>
-          GymStore
+        {/* 'text-primary' ahora usará nuestro amarillo (var(--bs-primary)) */}
+        <Navbar.Brand as={Link} to="/" className="fw-bold fs-4 text-primary">
+          <i className="fa-solid fa-bolt me-2"></i>
+          GYMTASTIC
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            {/* Usamos NavLink para la clase "active" automática */}
             <Nav.Link as={NavLink} to="/" end>Home</Nav.Link>
             <Nav.Link as={NavLink} to="/categorias">Categorías</Nav.Link>
             <Nav.Link as={NavLink} to="/ofertas">Ofertas</Nav.Link>
@@ -30,15 +31,17 @@ export const NavBar = () => {
             <Nav.Link as={NavLink} to="/blog">Blog</Nav.Link>
             <Nav.Link as={NavLink} to="/contacto">Contacto</Nav.Link>
           </Nav>
+          
           <Nav>
-            {/* Botones de la derecha del PDF */}
-            <Nav.Link as={NavLink} to="/login" className="btn btn-outline-primary me-2">
+            {/* 'btn-outline-primary' ahora usará nuestro amarillo */ }
+            <Nav.Link as={NavLink} to="/login" className="btn btn-outline-primary me-2 mb-2 mb-lg-0">
               Iniciar Sesión
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/registro" className="btn btn-primary me-3">
+            {/* 'btn-primary' ahora usará nuestro amarillo */ }
+            <Nav.Link as={NavLink} to="/registro" className="btn btn-primary me-3 mb-2 mb-lg-0">
               Crear Cuenta
             </Nav.Link>
-            {/* Botón del carrito */}
+            
             <Nav.Link as={NavLink} to="/carrito" className="btn btn-success">
               <i className="fa-solid fa-cart-shopping me-1"></i>
               Carrito 
