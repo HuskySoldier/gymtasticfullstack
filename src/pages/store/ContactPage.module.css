@@ -1,0 +1,99 @@
+.pageHeader {
+  background-color: var(--gym-dark);
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.pageTitle {
+  font-size: 3.5rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.pageSubtitle {
+  font-size: 1.25rem;
+  color: rgba(255,255,255,0.7);
+  font-family: 'Roboto', sans-serif;
+  text-transform: none;
+  font-weight: 400;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.contactSection {
+  padding: 3rem 0;
+}
+
+.contactCard {
+  background-color: var(--gym-dark);
+  color: var(--gym-light);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  height: 100%;
+}
+
+.cardTitle {
+  text-align: center;
+  font-size: 2.5rem;
+  color: var(--gym-primary); /* Color dorado de marca */
+  margin-bottom: 2rem;
+}
+
+.formLabel {
+  color: var(--gym-text-secondary);
+  font-weight: 500;
+}
+
+.formInput {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  color: var(--gym-light);
+  padding: 0.75rem 1rem;
+}
+.formInput:focus {
+  background-color: #2a2a2a;
+  color: var(--gym-light);
+  border-color: var(--gym-primary);
+  box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+}
+
+.mapContainer {
+  background-color: #e9ecef;
+  border-radius: 0.5rem;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gym-text-secondary);
+  font-weight: 500;
+  overflow: hidden; /* Para la imagen de mapa */
+}
+
+.mapContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%) brightness(0.8);
+}
+
+.infoList {
+  list-style: none;
+  padding-left: 0;
+  font-size: 1.1rem;
+  color: var(--gym-light);
+}
+.infoList li {
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+}
+.infoList i {
+  color: var(--gym-primary);
+  font-size: 1.5rem;
+  margin-right: 1.5rem;
+  margin-top: 0.25rem;
+  width: 25px; /* Ancho fijo para alinear el texto */
+  text-align: center;
+}

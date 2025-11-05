@@ -57,3 +57,4 @@ export const MOCK_PRODUCTS: Product[] = [
     category: 'Equipamiento'
   }
 ];
+

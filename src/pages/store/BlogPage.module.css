@@ -1,0 +1,78 @@
+.pageHeader {
+  background-color: var(--gym-dark);
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.pageTitle {
+  font-size: 3.5rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.pageSubtitle {
+  font-size: 1.25rem;
+  color: rgba(255,255,255,0.7);
+  font-family: 'Roboto', sans-serif;
+  text-transform: none;
+  font-weight: 400;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.blogCard {
+  background-color: var(--gym-light);
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden; /* Para la imagen */
+}
+.blogCard:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+}
+
+.cardImage {
+  height: 250px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.cardBody {
+  padding: 1.5rem;
+}
+
+.cardTitle {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  /* El color lo hereda de h1,h2... en index.css */
+}
+
+.cardMeta {
+  font-size: 0.9rem;
+  color: var(--gym-text-secondary);
+  margin-bottom: 1rem;
+  font-family: 'Roboto', sans-serif;
+  text-transform: none;
+  font-weight: 500;
+}
+
+.cardExcerpt {
+  color: var(--gym-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.readMoreBtn {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gym-primary);
+  text-decoration: none;
+  font-size: 1rem;
+}
+.readMoreBtn:hover {
+  color: var(--gym-dark);
+}

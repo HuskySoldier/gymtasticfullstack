@@ -1,0 +1,88 @@
+ .pageHeader {
+  background-color: var(--gym-dark);
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.pageTitle {
+  font-size: 3.5rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.pageSubtitle {
+  font-size: 1.25rem;
+  color: rgba(255,255,255,0.7);
+  font-family: 'Roboto', sans-serif;
+  text-transform: none;
+  font-weight: 400;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.aboutSection {
+  padding: 2rem 0;
+  align-items: center; /* Centrar verticalmente el texto con la imagen */
+}
+
+.aboutImage {
+  width: 100%;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.aboutText h2 {
+  font-size: 2.5rem;
+  color: var(--gym-primary);
+  margin-bottom: 1.5rem;
+}
+
+.aboutText p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--gym-text-secondary);
+}
+
+/* Reutilizamos los estilos de la sección de confianza */
+.pillarsSection {
+  padding: 5rem 0;
+  background-color: #f8f9fa; /* Un gris muy claro */
+}
+
+.pillarsItem {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.pillarsIcon {
+  font-size: 3rem;
+  color: var(--gym-primary); /* Color de marca */
+  margin-bottom: 1.5rem;
+}
+
+.pillarsTitle {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.pillarsText {
+  color: var(--gym-text-secondary);
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 4rem;
+  position: relative;
+}
+.sectionTitle::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: var(--gym-primary);
+  margin: 1rem auto 0;
+}

@@ -1,19 +1,22 @@
 import { useRoutes } from 'react-router-dom';
 
-// Importa las páginas de la tienda
+// --- Importa las páginas de la TIENDA ---
 import { HomePage } from '../pages/store/HomePage';
 import { ProductDetailPage } from '../pages/store/ProductDetailPage';
 import { CheckoutPage } from '../pages/store/CheckoutPage';
 import { CartPage } from '../pages/store/CartPage'; 
 import { OrderSuccessPage } from '../pages/store/OrderSuccessPage';
 import { OrderFailPage } from '../pages/store/OrderFailPage';
-// --- NUEVAS PÁGINAS ---
 import { CategoriesPage } from '../pages/store/CategoriesPage';
 import { ProductListPage } from '../pages/store/ProductListPage';
-
+import { LoginPage } from '../pages/store/LoginPage';
+import { RegisterPage } from '../pages/store/RegisterPage';
+import { AboutPage } from '../pages/store/AboutPage';
+import { BlogPage } from '../pages/store/BlogPage';
+import { BlogDetailPage } from '../pages/store/BlogDetailPage'; 
+import { ContactPage } from '../pages/store/ContactPage';
 
 // --- Importa el Layout y las páginas de ADMIN ---
-// ... (imports de admin sin cambios)
 import { AdminLayout } from '../pages/admin/AdminLayout';
 import { AdminDashboard } from '../pages/admin/AdminDashboard';
 import { AdminProducts } from '../pages/admin/AdminProducts';
@@ -24,22 +27,6 @@ import { AdminReportes } from '../pages/admin/AdminReportes';
 import { AdminProfile } from '../pages/admin/AdminProfile';
 
 
-// --- Placeholders (solo quedan los que no hemos construido) ---
-const PlaceholderPage = ({ title }: { title: string }) => (
-  <div className="text-white p-5 bg-dark min-vh-100">
-    <h1 className="text-white">{title}</h1>
-    <p>Esta página aún está en construcción.</p>
-  </div>
-);
-// const CategoriesPage = () => <PlaceholderPage title="Categorías" />; // <-- ELIMINADO
-const OffersPage = () => <PlaceholderPage title="Ofertas" />;
-const AboutPage = () => <PlaceholderPage title="Nosotros" />;
-const BlogPage = () => <PlaceholderPage title="Blog" />;
-const ContactPage = () => <PlaceholderPage title="Contacto" />;
-const LoginPage = () => <PlaceholderPage title="Iniciar Sesión" />;
-const RegisterPage = () => <PlaceholderPage title="Crear Cuenta" />;
-// --- Fin Placeholders ---
-
 
 export const AppRoutes = () => {
     const routes = useRoutes([
@@ -47,12 +34,13 @@ export const AppRoutes = () => {
         { path: '/', element: <HomePage /> },
         { path: '/producto/:id', element: <ProductDetailPage /> },
         
-        { path: '/categorias', element: <CategoriesPage /> }, // <-- ACTUALIZADO
-        { path: '/categoria/:categoryName', element: <ProductListPage /> }, // <-- NUEVA RUTA
+        { path: '/categorias', element: <CategoriesPage /> },
+        { path: '/categoria/:categoryName', element: <ProductListPage /> }, 
+
+        { path: '/blog', element: <BlogPage /> }, // <--- 4. ACTUALIZADO
+        { path: '/blog/:slug', element: <BlogDetailPage /> }, // <--- 5. NUEVA RUTA
         
-        { path: '/ofertas', element: <OffersPage /> },
-        { path: '/nosotros', element: <AboutPage /> },
-        { path: '/blog', element: <BlogPage /> },
+        { path: '/nosotros', element: <AboutPage /> }, // <--- 3. ACTUALIZADO
         { path: '/contacto', element: <ContactPage /> },
         { path: '/login', element: <LoginPage /> },
         { path: '/registro', element: <RegisterPage /> },
@@ -60,6 +48,7 @@ export const AppRoutes = () => {
         { path: '/checkout', element: <CheckoutPage /> },
         { path: '/compra-exitosa/:orderId', element: <OrderSuccessPage /> },
         { path: '/compra-fallida', element: <OrderFailPage /> },
+        { path: '/contacto', element: <ContactPage /> },
 
         // --- Rutas privadas del ADMINISTRADOR ---
         {

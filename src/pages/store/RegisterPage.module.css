@@ -1,0 +1,56 @@
+/*
+  Usamos los mismos nombres de clase que LoginPage.module.css
+  para mantener una consistencia visual perfecta.
+  Si quieres estilos diferentes, puedes cambiarles el nombre.
+*/
+.registerPage {
+  min-height: calc(100vh - 70px); 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  background-color: var(--gym-light); /* Fondo claro de la página */
+}
+
+.registerCard {
+  background-color: var(--gym-dark); /* Tarjeta oscura */
+  color: var(--gym-light);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.cardTitle {
+  text-align: center;
+  font-size: 2.5rem;
+  color: var(--gym-primary); /* Color dorado de marca */
+  margin-bottom: 2rem;
+}
+
+.formLabel {
+  color: var(--gym-text-secondary);
+  font-weight: 500;
+}
+
+.formInput {
+  background-color: #2a2a2a; /* Un poco más claro que el fondo */
+  border: 1px solid #444;
+  color: var(--gym-light);
+  padding: 0.75rem 1rem;
+}
+.formInput:focus {
+  background-color: #2a2a2a;
+  color: var(--gym-light);
+  border-color: var(--gym-primary);
+  box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+}
+
+.helperLink {
+  color: var(--gym-text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+.helperLink:hover {
+  color: var(--gym-primary);
+}
