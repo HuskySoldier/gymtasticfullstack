@@ -1,5 +1,5 @@
 import { MOCK_PRODUCTS } from '../data/mock-db';
-import type { export Product, AllProductsResponse, SingleProductResponse } from '../interfaces/app.interfaces';
+import type { Product, AllProductsResponse, SingleProductResponse } from '../interfaces/app.interfaces';
 
 // Simulación de una base de datos en memoria
 let productsDB: Product[] = [...MOCK_PRODUCTS];

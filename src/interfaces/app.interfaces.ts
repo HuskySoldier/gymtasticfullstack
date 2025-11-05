@@ -31,3 +31,24 @@ export interface SingleProductResponse {
   statusCode: number;
   product?: Product;
 }
+
+// --- NUEVAS INTERFACES PARA ÓRDENES ---
+
+export interface CustomerDetails {
+  nombre: string;
+  apellidos: string;
+  correo: string;
+  calle: string;
+  depto: string;
+  region: string;
+  comuna: string;
+}
+
+export interface Order {
+  id: string; // El OrderId (ej: "ORD-123456789")
+  date: string; // Fecha de la orden en formato ISO
+  customer: CustomerDetails;
+  items: CartItem[];
+  total: number;
+  status: 'Procesando' | 'Enviado' | 'Completado' | 'Cancelado';
+}

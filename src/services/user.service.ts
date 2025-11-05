@@ -29,6 +29,19 @@ export const getUsers = async (): Promise<User[]> => {
 };
 
 /**
+ * (ESTA ES LA FUNCIÓN INTEGRADA)
+ * Obtiene un usuario por su ID.
+ */
+export const getUserById = async (id: number): Promise<User | null> => {
+  return new Promise((resolve) => {
+    const user = mockUsers.find(u => u.id === id);
+    setTimeout(() => {
+      resolve(user || null);
+    }, 200);
+  });
+};
+
+/**
  * Crea un nuevo usuario.
  */
 export const createUser = async (userData: Omit<User, 'id'>): Promise<User> => {
