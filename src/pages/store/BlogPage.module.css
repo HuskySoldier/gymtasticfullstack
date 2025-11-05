@@ -21,13 +21,14 @@
   margin: 0 auto;
 }
 
+/* --- CAMBIOS AQUÍ --- */
 .blogCard {
-  background-color: var(--gym-light);
-  border: none;
+  background-color: var(--gym-dark-secondary); /* <- De blanco a gris oscuro */
+  border: 1px solid #333; /* <- Borde sutil */
   border-radius: 0.5rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
-  overflow: hidden; /* Para la imagen */
+  overflow: hidden; 
 }
 .blogCard:hover {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
@@ -47,7 +48,7 @@
 .cardTitle {
   font-size: 1.75rem;
   margin-bottom: 1rem;
-  /* El color lo hereda de h1,h2... en index.css */
+  color: var(--gym-light); /* <- Aseguramos texto blanco */
 }
 
 .cardMeta {
@@ -60,7 +61,7 @@
 }
 
 .cardExcerpt {
-  color: var(--gym-text-secondary);
+  color: var(--gym-text-secondary); /* <- Ya usa la variable correcta */
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
@@ -69,10 +70,10 @@
   font-family: 'Oswald', sans-serif;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--gym-primary);
+  color: var(--gym-primary); /* <- Será rojo */
   text-decoration: none;
   font-size: 1rem;
 }
 .readMoreBtn:hover {
-  color: var(--gym-dark);
+  color: var(--gym-light); /* <- Hover a blanco */
 }

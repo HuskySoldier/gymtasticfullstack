@@ -1,39 +1,39 @@
-/* --- NUEVO HERO BANNER --- */
+/* --- HERO BANNER (MODIFICADO) --- */
 .hero {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 60vh; /* Ocupa una buena parte de la pantalla */
+  height: 60vh;
   min-height: 400px;
   width: 100%;
   background-size: cover;
-  background-position: center 30%; /* Enfoca un poco más arriba */
-  background-image: url('https://source.unsplash.com/1600x600/?fitness,workout,dark');
+  background-position: center 30%;
+  /* Imagen más brillante y enérgica */
+  background-image: url('https://source.unsplash.com/1600x600/?fitness,energy,bright,gym');
   color: white;
   text-align: center;
 }
 
 .hero::before {
-  /* Overlay oscuro para legibilidad */
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(18, 18, 18, 0.7); /* Usamos --gym-dark con opacidad */
+  background-color: rgba(18, 18, 18, 0.6); 
 }
 
 .heroContent {
-  position: relative; /* Se asegura que esté sobre el overlay */
+  position: relative;
   z-index: 2;
   max-width: 800px;
   padding: 2rem;
 }
 
 .heroTitle {
-  font-size: 4.5rem; /* Título masivo */
+  font-size: 4.5rem;
   line-height: 1.1;
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
   margin-bottom: 1rem;
@@ -48,11 +48,11 @@
   margin-bottom: 2rem;
 }
 
-/* --- NUEVA SECCIÓN DE CONFIANZA --- */
+/* --- SECCIÓN DE CONFIANZA (MODIFICADA) --- */
 .trustSection {
   padding: 4rem 0;
-  background-color: #f8f9fa; /* Un gris muy claro */
-  border-bottom: 1px solid #e0e0e0;
+  background-color: var(--gym-dark); 
+  border-bottom: 1px solid #333;
 }
 
 .trustItem {
@@ -61,17 +61,18 @@
 
 .trustIcon {
   font-size: 3rem;
-  color: var(--gym-primary); /* Color de marca */
+  color: var(--gym-primary); /* <-- Ahora será rojo */
   margin-bottom: 1.5rem;
 }
 
 .trustTitle {
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
+  color: var(--gym-light);
 }
 
 .trustText {
-  color: var(--gym-text-secondary);
+  color: var(--gym-text-secondary); /* <-- Usa el nuevo texto secundario */
   max-width: 300px;
   margin: 0 auto;
 }
@@ -82,9 +83,32 @@
   font-size: 2.5rem;
   margin-bottom: 1rem;
   position: relative;
+  color: var(--gym-light); /* <-- Aseguramos que sea blanco */
 }
 .sectionTitle::after {
-  /* Línea dorada decorativa debajo del título */
+  content: '';
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: var(--gym-primary); /* <-- Ahora será rojo */
+  margin: 1rem auto 0;
+}
+
+/* --- SECCIÓN DE PRODUCTOS (MODIFICADA) --- */
+.featuredSection {
+  padding: 5rem 0;
+  /* --- ESTE ES EL ARREGLO --- */
+  background-color: var(--gym-dark-secondary); /* <-- De gris claro a gris oscuro */
+}
+
+.featuredTitle {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 4rem;
+  position: relative;
+  color: var(--gym-light); /* <-- Aseguramos que sea blanco */
+}
+.featuredTitle::after {
   content: '';
   display: block;
   width: 80px;
@@ -93,17 +117,18 @@
   margin: 1rem auto 0;
 }
 
+
 /* --- TARJETAS DE CATEGORÍA MEJORADAS --- */
 .categoryCard {
   border: none;
   border-radius: 0.5rem;
-  height: 250px; /* Un poco más altas */
+  height: 250px;
   background-size: cover;
   background-position: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
-  overflow: hidden; /* Para el efecto de zoom */
+  overflow: hidden;
 }
 
 .categoryCardImage {
@@ -115,7 +140,7 @@
 }
 
 .categoryCard:hover .categoryCardImage {
-  transform: scale(1.05); /* Efecto de zoom sutil */
+  transform: scale(1.05);
 }
 
 .categoryOverlay {
@@ -137,4 +162,61 @@
 .categoryTitle {
   font-size: 2.25rem;
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* --- NUEVA SECCIÓN PROMO (CTA) --- */
+.promoSection {
+  background-color: var(--gym-dark);
+  color: var(--gym-light);
+  padding: 5rem 0;
+}
+
+.promoContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding-right: 2rem;
+}
+
+.promoTitle {
+  font-size: 3rem;
+  color: var(--gym-primary); /* <-- Ahora será rojo */
+  line-height: 1.2;
+}
+
+.promoText {
+  font-size: 1.25rem;
+  color: var(--gym-text-secondary); /* <-- Usa el nuevo texto secundario */
+  margin: 1.5rem 0;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  text-transform: none;
+}
+
+.promoImage {
+  /* Este es el MARCO */
+  background-size: cover;
+  background-position: center;
+  min-height: 400px;
+  border-radius: .5rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  
+  /* --- Propiedades clave --- */
+  overflow: hidden; /* <-- MUY IMPORTANTE: Recorta la imagen que se salga */
+  display: flex;    /* <-- Permite que la imagen de adentro crezca */
+  width: 100%;
+  height: 100%;
+  
+  /* Elimina la imagen de fondo de aquí */
+  /* background-image: url('...'); <-- ELIMINA ESTA LÍNEA */
+}
+
+.promoImageInner {
+  /* Esta es la IMAGEN DE ADENTRO */
+  width: 100%;
+  height: 100%;
+  
+  /* --- ESTA ES LA MAGIA --- */
+  object-fit: cover; /* <-- Le dice a la imagen que llene el marco sin distorsionarse */
 }

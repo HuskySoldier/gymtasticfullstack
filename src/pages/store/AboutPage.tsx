@@ -24,7 +24,7 @@ export const AboutPage = () => {
           <Row className={styles.aboutSection}>
             <Col md={6} className="mb-4 mb-md-0">
               <Image 
-                src="https://source.unsplash.com/800x600/?gym,modern,interior" 
+                src="/imagenes/gym.jpg" 
                 alt="Interior de Gimnasio" 
                 className={styles.aboutImage} 
                 fluid 

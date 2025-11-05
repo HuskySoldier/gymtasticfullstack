@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, Form, Button, Spinner, Alert, Row, Col } from 'react-bootstrap';
-import { getUserById, updateUser, User } from '../../services/user.service';
+import { Card, Form, Spinner, Alert, Row, Col } from 'react-bootstrap';
+import { getUserById, updateUser, type User } from '../../services/user.service';
 // Reutilizamos los estilos de formulario que ya tenemos
 import formStyles from '../store/RegisterPage.module.css';
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { UserOrderHistoryModal } from '../../components/admin/UserOrderHistoryModal';
 import { Row, Col, Card, Form, Button, Table, Spinner, Alert, Modal, Badge } from 'react-bootstrap';
 import { getUsers, createUser, updateUser, deleteUser, type User } from '../../services/user.service';
 // Reutilizamos los estilos de formulario que ya tenemos
@@ -18,6 +19,14 @@ export const AdminUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [userForHistory, setUserForHistory] = useState<User | null>(null);
+
+  const handleShowHistory = (user: User) => {
+    setUserForHistory(user);
+    setShowHistoryModal(true);
+  };
 
   // --- Estado del Formulario ---
   const [isEditMode, setIsEditMode] = useState(false);
@@ -237,11 +246,23 @@ export const AdminUsers = () => {
                       </Badge>
                     </td>
                     <td>
+                      {/* ESTE ES EL BOTÓN NUEVO */}
+                      <Button 
+                        variant="outline-info" 
+                        size="sm" 
+                        className="me-2"
+                        onClick={() => handleShowHistory(user)}
+                        title="Ver Historial de Compras"
+                      >
+                        <i className="fa-solid fa-receipt"></i>
+                      </Button>
+                      
                       <Button 
                         variant="outline-primary" 
                         size="sm" 
                         className="me-2"
                         onClick={() => handleEditClick(user)}
+                        title="Editar"
                       >
                         <i className="fa-solid fa-pen-to-square"></i>
                       </Button>
@@ -249,6 +270,7 @@ export const AdminUsers = () => {
                         variant="outline-danger" 
                         size="sm"
                         onClick={() => handleShowDeleteModal(user)}
+                        title="Eliminar"
                       >
                         <i className="fa-solid fa-trash"></i>
                       </Button>
@@ -260,6 +282,13 @@ export const AdminUsers = () => {
           )}
         </Col>
       </Row>
+
+      {/* --- Modal de Historial de Compras --- */}
+      <UserOrderHistoryModal 
+        show={showHistoryModal}
+        user={userForHistory}
+        onHide={() => setShowHistoryModal(false)}
+      />
 
       {/* --- Modal de Confirmación de Borrado --- */}
       <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered>

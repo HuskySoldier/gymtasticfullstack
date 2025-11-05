@@ -1,7 +1,9 @@
+/* --- CAMBIOS AQUÍ --- */
 .articleHeader {
   padding: 4rem 0;
   text-align: center;
-  background-color: #f8f9fa; /* Fondo gris claro */
+  background-color: var(--gym-dark-secondary); /* <- De gris claro a gris oscuro */
+  border-bottom: 1px solid #333;
 }
 
 .articleTitle {
@@ -9,6 +11,7 @@
   max-width: 800px;
   margin: 0 auto 1.5rem auto;
   line-height: 1.2;
+  color: var(--gym-light); /* <- Aseguramos texto blanco */
 }
 
 .articleMeta {
@@ -19,33 +22,35 @@
   font-weight: 500;
 }
 .articleMeta strong {
-  color: var(--gym-primary);
+  color: var(--gym-primary); /* <- Será rojo */
 }
 
 .mainImage {
   width: 100%;
-  max-height: 500px; /* Altura máxima para la imagen */
+  max-height: 500px;
   object-fit: cover;
   border-radius: 0.5rem;
   margin: 2rem 0;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
+/* --- CAMBIOS AQUÍ --- */
 .articleBody {
-  max-width: 750px; /* Ancho ideal para lectura */
-  margin: 2rem auto; /* Centrar el contenido */
+  max-width: 750px; 
+  margin: 2rem auto; 
   font-size: 1.15rem;
   line-height: 1.8;
-  color: #212529; /* Texto casi negro para legibilidad */
+  color: var(--gym-text); /* <- De negro a blanco */
 }
 
 /* Estilos para el contenido HTML del mock */
 .articleBody p {
   margin-bottom: 1.5rem;
+  color: var(--gym-text-secondary); /* <- Texto secundario para párrafos */
 }
 .articleBody h3 {
   font-size: 2rem;
-  color: var(--gym-primary);
+  color: var(--gym-primary); /* <- Títulos en rojo */
   margin-top: 2.5rem;
   margin-bottom: 1rem;
 }
@@ -54,7 +59,7 @@
   font-style: italic;
   font-size: 1.25rem;
   color: var(--gym-text-secondary);
-  border-left: 4px solid var(--gym-primary);
+  border-left: 4px solid var(--gym-primary); /* <- Borde rojo */
   padding-left: 1.5rem;
   margin: 2rem 0;
 }

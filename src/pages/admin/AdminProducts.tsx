@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Table, Button, Spinner, Alert, Modal, Image } from 'react-bootstrap';
+import { Table, Button, Spinner, Alert, Modal, Image, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { getProducts, deleteProduct } from '../../services/product.service';
 import type { Product } from '../../interfaces/app.interfaces';
+
+// --- 1. IMPORTAMOS LOS NUEVOS HELPERS Y HOOKS ---
+import { formatCurrency, formatStock } from '../../helpers';
+import { useModal } from '../../hooks';
+
+const CRITICAL_STOCK_LEVEL = 30;
 
 export const AdminProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -10,8 +16,11 @@ export const AdminProducts = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // --- Estados para el Modal de Confirmación (Profesional) ---
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showCriticalOnly, setShowCriticalOnly] = useState(false);
+
+  // --- 2. REFACTORIZAMOS EL ESTADO DEL MODAL ---
+  // const [showDeleteModal, setShowDeleteModal] = useState(false); // <--- Línea antigua
+  const { isOpen: isDeleteModalOpen, openModal: openDeleteModal, closeModal: closeDeleteModal } = useModal(); // <--- Nueva línea
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   useEffect(() => {
@@ -35,13 +44,17 @@ export const AdminProducts = () => {
     }
   };
 
+  // --- 3. USAMOS LA FUNCIÓN DEL HOOK ---
   const handleShowDeleteModal = (product: Product) => {
     setProductToDelete(product);
-    setShowDeleteModal(true);
+    // setShowDeleteModal(true); // <--- Línea antigua
+    openDeleteModal(); // <--- Nueva línea
   };
 
+  // --- 4. USAMOS LA FUNCIÓN DEL HOOK ---
   const handleCloseDeleteModal = () => {
-    setShowDeleteModal(false);
+    // setShowDeleteModal(false); // <--- Línea antigua
+    closeDeleteModal(); // <--- Nueva línea
     setProductToDelete(null);
   };
 
@@ -51,7 +64,6 @@ export const AdminProducts = () => {
     try {
       const response = await deleteProduct(productToDelete.id);
       if (response.ok) {
-        // Actualizar la UI instantáneamente
         setProducts(products.filter(p => p.id !== productToDelete.id));
       } else {
         setError('No se pudo eliminar el producto.');
@@ -59,13 +71,17 @@ export const AdminProducts = () => {
     } catch (err) {
       setError('Error de conexión al eliminar.');
     } finally {
-      handleCloseDeleteModal();
+      handleCloseDeleteModal(); // Esto ya estaba bien
     }
   };
 
   const handleNavigate = (path: string) => {
     navigate(path);
   };
+
+  const displayedProducts = showCriticalOnly
+    ? products.filter(p => p.stock !== Infinity && p.stock <= CRITICAL_STOCK_LEVEL)
+    : products;
 
   return (
     <div>
@@ -79,6 +95,16 @@ export const AdminProducts = () => {
           Crear Nuevo Producto
         </button>
       </div>
+
+      <Form.Group className="mb-3" controlId="stockFilter">
+        <Form.Check 
+          type="switch"
+          label="Mostrar solo productos con stock crítico (menos de 30)"
+          className="text-white"
+          checked={showCriticalOnly}
+          onChange={(e) => setShowCriticalOnly(e.target.checked)}
+        />
+      </Form.Group>
 
       {loading && <Spinner animation="border" variant="primary" />}
       {error && <Alert variant="danger">{error}</Alert>}
@@ -97,7 +123,7 @@ export const AdminProducts = () => {
             </tr>
           </thead>
           <tbody>
-            {products.map(product => (
+            {displayedProducts.map(product => (
               <tr key={product.id}>
                 <td>{product.id}</td>
                 <td>
@@ -105,8 +131,15 @@ export const AdminProducts = () => {
                 </td>
                 <td>{product.name}</td>
                 <td>{product.category}</td>
-                <td>${product.price.toLocaleString('es-CL')}</td>
-                <td>{product.stock === Infinity ? 'Ilimitado' : product.stock}</td>
+                
+                {/* --- 5. USAMOS EL HELPER DE MONEDA --- */}
+                <td>{formatCurrency(product.price)}</td>
+                
+                {/* --- 6. USAMOS EL HELPER DE STOCK --- */}
+                <td className={product.stock !== Infinity && product.stock <= CRITICAL_STOCK_LEVEL ? 'text-danger fw-bold' : ''}>
+                  {formatStock(product.stock)}
+                </td>
+                
                 <td>
                   <Button 
                     variant="outline-primary" 
@@ -130,8 +163,12 @@ export const AdminProducts = () => {
         </Table>
       )}
 
-      {/* --- Modal de Confirmación de Borrado --- */}
-      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered>
+      {/* --- 7. USAMOS EL ESTADO DEL HOOK --- */}
+      <Modal 
+        show={isDeleteModalOpen} // <--- Usamos el estado del hook
+        onHide={handleCloseDeleteModal} 
+        centered
+      >
         <Modal.Header closeButton className="bg-dark text-white">
           <Modal.Title>Confirmar Eliminación</Modal.Title>
         </Modal.Header>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Alert } from 'react-bootstrap';
 import { NavBar } from '../../components/shared/NavBar';
 import { Footer } from '../../components/shared/Footer';
 import styles from './ContactPage.module.css';
@@ -111,13 +111,19 @@ export const ContactPage = () => {
                 <Card.Body className="p-4 p-sm-5">
                   <h2 className={styles.cardTitle}>Infórmación</h2>
                   
+                  {/* --- MAPA INSERTADO --- */}
                   <div className={styles.mapContainer}>
-                    {/* Placeholder de mapa profesional */}
-                    <img 
-                      src="https://source.unsplash.com/600x400/?map,city" 
-                      alt="Mapa de ubicación"
-                    />
+                    <iframe 
+                      src="https://www.google.com/maps/embed?pb=!1m12!1m8!1m3!1d1666.1431122481938!2d-70.67751113009538!3d-33.36359277614045!3m2!1i1024!2i768!4f13.1!2m1!1sduocuc!5e0!3m2!1ses-419!2scl!4v1762367334723!5m2!1ses-419!2scl" 
+                      width="100%" 
+                      height="300" // Ajusta esta altura si lo deseas
+                      style={{ border: 0 }} 
+                      allowFullScreen={true} 
+                      loading="lazy" 
+                      referrerPolicy="no-referrer-when-downgrade"
+                    ></iframe>
                   </div>
+                  {/* --- FIN MAPA --- */}
                   
                   <ul className={styles.infoList}>
                     <li className="mt-4">

@@ -1,9 +1,9 @@
 export interface BlogPost {
+  image: string | undefined;
   id: number;
   slug: string; // Para la URL
   title: string;
   excerpt: string;
-  imageUrl: string;
   author: string;
   date: string;
   content: string; // Contenido HTML
@@ -15,7 +15,7 @@ export const mockBlogPosts: BlogPost[] = [
     slug: '5-ejercicios-esenciales-de-espalda',
     title: '5 Ejercicios Esenciales para una Espalda Fuerte',
     excerpt: 'Descubre los 5 ejercicios clave que no pueden faltar en tu rutina de espalda para construir músculo y fuerza...',
-    imageUrl: 'https://source.unsplash.com/800x600/?deadlift,back,workout',
+    image: '/imagenes/ejercicios.jpg',
     author: 'GYMTASTIC Team',
     date: '03 Nov, 2025',
     content: `
@@ -44,7 +44,7 @@ export const mockBlogPosts: BlogPost[] = [
     slug: 'la-verdad-sobre-la-creatina',
     title: 'La Verdad Sobre la Creatina: Mitos vs. Realidad',
     excerpt: '¿Es segura? ¿Realmente funciona? Desmentimos los mitos más comunes sobre el suplemento más estudiado...',
-    imageUrl: 'https://source.unsplash.com/800x600/?supplements,creatine',
+    image: '/imagenes/Creatina.jpg',
     author: 'Dra. Ana Pérez',
     date: '01 Nov, 2025',
     content: `

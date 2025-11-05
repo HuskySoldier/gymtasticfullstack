@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Row, Col, Card, Spinner, Table, Button, Badge } from 'react-bootstrap';
-import { getUsers, User } from '../../services/user.service';
-import { getProducts, Product } from '../../services/product.service';
+import { Row, Col, Card, Spinner, Table, Button, Badge } from 'react-bootstrap'; // <-- Asegúrate que Row, Col, etc. estén importados
+import { getUsers } from '../../services/user.service'; // <-- Se añade 'type'
+import { getProducts } from '../../services/product.service';
+import type { Product } from '../../interfaces/app.interfaces'; // <-- Se importa Product desde la fuente original
 import styles from './AdminReportes.module.css';
+import { useState, useEffect } from 'react';
 
 interface ReportStats {
   userCount: number;

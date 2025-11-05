@@ -30,16 +30,6 @@ import { AdminProductCreate } from '../pages/admin/AdminProductCreate';
 import { AdminProductEdit } from '../pages/admin/AdminProductEdit';
 
 
-// --- Placeholders (solo los que no hemos construido) ---
-const PlaceholderPage = ({ title }: { title: string }) => (
-  <div className="text-white p-5 bg-dark min-vh-100">
-    <h1 className="text-white">{title}</h1>
-    <p>Esta página aún está en construcción.</p>
-  </div>
-);
-// --- Fin Placeholders ---
-
-
 export const AppRoutes = () => {
     const routes = useRoutes([
         // --- Rutas públicas de la TIENDA ---

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Container, Row, Col, Spinner, Alert, Button } from 'react-bootstrap';
+import { Container, Row, Col, Spinner, Alert, Image } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { NavBar } from '../../components/shared/NavBar';
 import { ProductCard } from '../../components/store/ProductCard';
-import { getProducts } from '../../services/product.service'; // Asegúrate que la ruta sea correcta
+import { getProducts } from '../../services/product.service';
 import type { Product } from '../../interfaces/app.interfaces';
 import styles from './HomePage.module.css'; 
-import { Footer } from '../../components/shared/Footer'; // <--- 1. IMPORTA EL FOOTER
+import { Footer } from '../../components/shared/Footer';
 
-// ... (Mapeo de categoryImages y el resto del componente sin cambios)
+
 const categoryImages: { [key: string]: string } = {
   'Membresías': 'https://source.unsplash.com/600x500/?gym,contract',
   'Suplementos': 'https://source.unsplash.com/600x500/?supplements,fitness',
@@ -25,7 +25,6 @@ export const HomePage = () => {
   const categories = [...new Set(products.map(p => p.category))];
 
   useEffect(() => {
-    // ... (fetchData sin cambios)
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -46,7 +45,6 @@ export const HomePage = () => {
   }, []);
 
   const renderProducts = () => {
-    // ... (renderProducts sin cambios)
     if (loading) {
       return (
         <div className="text-center mt-5">
@@ -70,13 +68,12 @@ export const HomePage = () => {
   };
 
   return (
-    // <--- 2. AÑADIMOS CLASES DE FLEXBOX PARA EL FOOTER ---
     <div className="min-vh-100 d-flex flex-column"> 
       <NavBar />
       
-      {/* --- 3. CONTENIDO PRINCIPAL --- */}
       <main className="flex-grow-1">
-        {/* --- HERO BANNER --- */}
+        
+        {/* --- HERO BANNER (Ahora más brillante) --- */}
         <div className={styles.hero}>
           <div className={styles.heroContent}>
             <h1 className={styles.heroTitle}>
@@ -91,7 +88,7 @@ export const HomePage = () => {
           </div>
         </div>
 
-        {/* --- SECCIÓN DE CONFIANZA --- */}
+        {/* --- SECCIÓN DE CONFIANZA (Ahora oscura) --- */}
         <Container fluid className={styles.trustSection}>
           <Container>
             <Row>
@@ -114,8 +111,8 @@ export const HomePage = () => {
           </Container>
         </Container>
         
+        {/* --- SECCIÓN DE CATEGORÍAS (Fondo blanco por defecto) --- */}
         <Container className="py-5">
-          {/* --- SECCIÓN DE CATEGORÍAS --- */}
           <h2 className={styles.sectionTitle}>Comprar por Categoría</h2>
           <Row className="mb-4 mt-5">
             {categories.map(category => (
@@ -136,16 +133,56 @@ export const HomePage = () => {
               </Col>
             ))}
           </Row>
-          
-          {/* --- SECCIÓN DE PRODUCTOS DESTACADOS --- */}
-          <h2 className={`${styles.sectionTitle} mt-5`}>Productos Destacados</h2>
-          <Row className="mt-5">
-            {renderProducts()}
-          </Row>
         </Container>
+
+        {/* --- NUEVA SECCIÓN PROMO (Oscura) --- */}
+        <Container fluid className={styles.promoSection}>
+          <Container>
+            <Row className="align-items-center">
+              <Col md={6} className="mb-4 mb-md-0">
+                <div className={styles.promoContent}>
+                  <h2 className={styles.promoTitle}>
+                    EQUIPAMIENTO PROFESIONAL
+                  </h2>
+                  <p className={styles.promoText}>
+                    Desde mancuernas hasta máquinas completas. Lleva tu entrenamiento en casa al siguiente nivel.
+                  </p>
+                  <div className="mt-2">
+                    <button 
+                      className="btn-primary-gradient" 
+                      onClick={() => navigate('/categoria/Equipamiento')}
+                    >
+                      Ver Equipamiento
+                    </button>
+                  </div>
+                </div>
+              </Col>
+              <Col md={6}>
+              {/* 2. Reemplaza el 'div' vacío por esto: */}
+              <div className={styles.promoImage}>
+                <Image 
+                  src="/imagenes/PesaRusa.png" // <-- 3. Pon la ruta a tu imagen local
+                  alt="Equipamiento profesional" 
+                  className={styles.promoImageInner} // <-- 4. Usa la nueva clase
+                />
+              </div>
+            </Col>
+            </Row>
+          </Container>
+        </Container>
+
+        {/* --- SECCIÓN DE PRODUCTOS DESTACADOS (Fondo gris claro) --- */}
+        <div className={styles.featuredSection}>
+          <Container>
+            <h2 className={styles.featuredTitle}>Productos Destacados</h2>
+            <Row className="mt-5">
+              {renderProducts()}
+            </Row>
+          </Container>
+        </div>
+
       </main>
 
-      {/* --- 4. USA EL COMPONENTE FOOTER --- */}
       <Footer />
     </div>
   );

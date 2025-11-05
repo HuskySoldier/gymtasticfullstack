@@ -1,4 +1,4 @@
- .pageHeader {
+.pageHeader {
   background-color: var(--gym-dark);
   color: white;
   padding: 4rem 2rem;
@@ -34,20 +34,20 @@
 
 .aboutText h2 {
   font-size: 2.5rem;
-  color: var(--gym-primary);
+  color: var(--gym-primary); /* <-- Será rojo */
   margin-bottom: 1.5rem;
 }
 
 .aboutText p {
   font-size: 1.1rem;
   line-height: 1.7;
-  color: var(--gym-text-secondary);
+  color: var(--gym-text-secondary); /* <-- Usa el color secundario claro */
 }
 
-/* Reutilizamos los estilos de la sección de confianza */
+/* --- ESTE ES EL ARREGLO --- */
 .pillarsSection {
   padding: 5rem 0;
-  background-color: #f8f9fa; /* Un gris muy claro */
+  background-color: var(--gym-dark-secondary); /* <-- De gris claro a gris oscuro */
 }
 
 .pillarsItem {
@@ -57,17 +57,18 @@
 
 .pillarsIcon {
   font-size: 3rem;
-  color: var(--gym-primary); /* Color de marca */
+  color: var(--gym-primary); /* <-- Será rojo */
   margin-bottom: 1.5rem;
 }
 
 .pillarsTitle {
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
+  color: var(--gym-light); /* <-- Aseguramos que sea blanco */
 }
 
 .pillarsText {
-  color: var(--gym-text-secondary);
+  color: var(--gym-text-secondary); /* <-- Usa el color secundario claro */
   max-width: 300px;
   margin: 0 auto;
 }
@@ -77,6 +78,7 @@
   font-size: 2.5rem;
   margin-bottom: 4rem;
   position: relative;
+  color: var(--gym-light); /* <-- Aseguramos que sea blanco */
 }
 .sectionTitle::after {
   content: '';

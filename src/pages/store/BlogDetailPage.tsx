@@ -54,7 +54,7 @@ export const BlogDetailPage = () => {
           <Row className="justify-content-center">
             <Col lg={10} xl={8}>
               <Image 
-                src={post.imageUrl} 
+                src={post.image} 
                 alt={post.title} 
                 fluid 
                 className={styles.mainImage}

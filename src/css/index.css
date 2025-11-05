@@ -1,21 +1,27 @@
 /* Definición de la paleta de colores y tipografía de GYMTASTIC
+   TEMA OSCURO (NEGRO/ROJO)
 */
 :root {
-  --gym-primary: #FFC107; /* Dorado vibrante */
-  --gym-dark: #121212;     /* Un negro más profundo y moderno */
-  --gym-light: #FFFFFF;
-  --gym-text: #333;
-  --gym-text-secondary: #6c757d;
+  /* --- 1. TU NUEVA PALETA --- */
+  --gym-primary: #DC3545; /* Rojo Vibrante (Bootstrap Danger) */
+  --gym-dark: #121212;     /* Negro principal (casi negro) */
+  --gym-dark-secondary: #1E1E1E; /* Gris oscuro (para tarjetas) */
+  --gym-light: #F8F9FA;    /* Blanco (para texto principal) */
+  --gym-text: #F8F9FA;     /* Color de texto principal */
+  --gym-text-secondary: rgba(255, 255, 255, 0.7); /* Texto secundario (blanco opaco) */
 
-  /* --- DEFINICIÓN DE GRADIENTE --- */
-  --gym-primary-gradient: linear-gradient(90deg, #FFC107 0%, #FF9800 100%);
+  /* --- 2. GRADIENTE ROJO --- */
+  --gym-primary-gradient: linear-gradient(90deg, #DC3545 0%, #a1232f 100%);
 
-  /* --- SOBREESCRITURA DE BOOTSTRAP --- */
+  /* --- 3. SOBREESCRITURA DE BOOTSTRAP --- */
   --bs-primary: var(--gym-primary);
-  --bs-primary-rgb: 255, 193, 7;
-  --bs-link-color: var(--gym-dark);
+  --bs-primary-rgb: 220, 53, 69; /* RGB de #DC3545 */
+  --bs-link-color: var(--gym-primary);
+  --bs-body-bg: var(--gym-dark); /* Fondo del body será oscuro */
+  --bs-body-color: var(--gym-light); /* Color del texto será claro */
 }
 
+/* --- 4. BODY PREDETERMINADO --- */
 body {
   margin: 0;
   font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen',
@@ -23,23 +29,23 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--gym-light); /* Fondo blanco limpio */
-  color: var(--gym-text);
+  background-color: var(--bs-body-bg); /* <- USA EL FONDO OSCURO */
+  color: var(--bs-body-color);         /* <- USA EL TEXTO CLARO */
 }
 
-/* Tipografía de Títulos */
+/* Tipografía de Títulos (sin cambios) */
 h1, h2, h3, h4, h5, h6, .navbar-brand, .display-4 {
   font-family: 'Oswald', sans-serif;
   text-transform: uppercase;
   font-weight: 700;
-  letter-spacing: 0.5px; /* Un toque de espacio */
+  letter-spacing: 0.5px;
 }
 
-/* --- NUEVO BOTÓN CON GRADIENTE --- */
+/* --- 5. BOTÓN CON GRADIENTE (ACTUALIZADO) --- */
 .btn-primary-gradient {
   background: var(--gym-primary-gradient);
   border: none;
-  color: var(--gym-dark);
+  color: var(--gym-light); /* <- Texto claro */
   font-family: 'Oswald', sans-serif;
   text-transform: uppercase;
   font-weight: 700;
@@ -47,21 +53,21 @@ h1, h2, h3, h4, h5, h6, .navbar-brand, .display-4 {
   padding: 0.75rem 1.5rem;
   border-radius: 0.375rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3); /* <- Sombra roja */
 }
 .btn-primary-gradient:hover {
-  color: var(--gym-dark);
-  box-shadow: 0 6px 20px rgba(255, 193, 7, 0.6);
+  color: var(--gym-light);
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5);
   transform: translateY(-2px);
 }
 
-/* --- NUEVO FOOTER PROFESIONAL --- */
+/* --- Footer (ya estaba oscuro, pero ajustamos color de texto) --- */
 .site-footer {
   background-color: var(--gym-dark);
-  color: var(--gym-text-secondary);
+  color: var(--gym-text-secondary); /* <- Usa el nuevo texto secundario */
   padding: 3rem 0;
   margin-top: 5rem;
-  border-top: 4px solid var(--gym-primary);
+  border-top: 4px solid var(--gym-primary); /* <- Borde rojo */
 }
 .site-footer h5 {
   color: var(--gym-light);
@@ -86,9 +92,4 @@ h1, h2, h3, h4, h5, h6, .navbar-brand, .display-4 {
 .social-icons a {
   font-size: 1.5rem;
   margin-right: 1rem;
-}
-
-/* Estilos para el layout del Admin */
-body.admin-layout {
-  background-color: #212529;
 }

@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
 import { NavBar } from '../../components/shared/NavBar';
-import styles from './RegisterPage.module.css'; // Importamos los estilos
+import styles from './RegisterPage.module.css';
+import { validateRegistration } from '../../helpers';
+// --- 1. IMPORTA EL SERVICIO DE USUARIO ---
+import { createUser } from '../../services/user.service';
 
 export const RegisterPage = () => {
   const [nombre, setNombre] = useState('');
@@ -11,34 +14,53 @@ export const RegisterPage = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  
+  // --- 2. AÑADE UN ESTADO DE CARGA ---
+  const [loading, setLoading] = useState(false);
+  
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // --- 3. CONVIERTE LA FUNCIÓN EN ASYNC ---
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(''); // Limpiar errores previos
+    setError(''); 
+    setLoading(true); // <-- Activa el estado de carga
 
-    // --- Validación de campos ---
-    if (!nombre || !apellidos || !email || !password || !confirmPassword) {
-      setError('Por favor, completa todos los campos.');
+    const validationResult = validateRegistration({
+      nombre,
+      apellidos,
+      email,
+      password,
+      confirmPassword
+    });
+
+    if (!validationResult.isValid) {
+      setError(validationResult.message || 'Error de validación desconocido.');
+      setLoading(false); // <-- Detiene la carga si hay error
       return;
     }
-    if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
-      return;
+
+    // --- 4. LLAMA AL SERVICIO 'createUser' ---
+    try {
+      await createUser({
+        name: `${nombre.trim()} ${apellidos.trim()}`, // Combina nombre y apellido
+        email: email.trim(),
+        password: password,
+        role: 'Cliente' // Asigna el rol por defecto
+      });
+      
+      // Redirigir al login después del registro exitoso
+      navigate('/login');
+
+    } catch (err) {
+      console.error("Error en el registro:", err);
+      setError("Error al registrar el usuario. Inténtalo de nuevo.");
+      setLoading(false); // <-- Detiene la carga si hay error
     }
-
-    // --- Lógica de Registro (Simulada) ---
-    console.log('Registrando nuevo usuario:', { nombre, apellidos, email, password });
-
-    // Simulación de un registro exitoso
-    // Aquí iría la llamada a tu API o servicio de autenticación
-    
-    // Redirigir al login después del registro exitoso
-    navigate('/login');
   };
 
   return (
-    <div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: 'var(--gym-light)' }}>
+    <div className="min-vh-100 d-flex flex-column">
       <NavBar />
       
       <div className={styles.registerPage}>
@@ -53,7 +75,7 @@ export const RegisterPage = () => {
                     {error && <Alert variant="danger">{error}</Alert>}
 
                     <Row>
-                      {/* Campo de Nombre */}
+                      {/* ... (campos de Nombre y Apellidos) ... */}
                       <Col md={6}>
                         <Form.Group className="mb-3" controlId="registerNombre">
                           <Form.Label className={styles.formLabel}>Nombre</Form.Label>
@@ -63,10 +85,10 @@ export const RegisterPage = () => {
                             className={styles.formInput}
                             value={nombre}
                             onChange={(e) => setNombre(e.target.value)}
+                            disabled={loading} // <-- Deshabilita mientras carga
                           />
                         </Form.Group>
                       </Col>
-                      {/* Campo de Apellidos */}
                       <Col md={6}>
                         <Form.Group className="mb-3" controlId="registerApellidos">
                           <Form.Label className={styles.formLabel}>Apellidos</Form.Label>
@@ -76,12 +98,13 @@ export const RegisterPage = () => {
                             className={styles.formInput}
                             value={apellidos}
                             onChange={(e) => setApellidos(e.target.value)}
+                            disabled={loading} // <-- Deshabilita mientras carga
                           />
                         </Form.Group>
                       </Col>
                     </Row>
 
-                    {/* Campo de Email */}
+                    {/* ... (campos de Email, Password, Confirmar) ... */}
                     <Form.Group className="mb-3" controlId="registerEmail">
                       <Form.Label className={styles.formLabel}>Correo Electrónico</Form.Label>
                       <Form.Control
@@ -90,22 +113,20 @@ export const RegisterPage = () => {
                         className={styles.formInput}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={loading} // <-- Deshabilita mientras carga
                       />
                     </Form.Group>
-
-                    {/* Campo de Contraseña */}
                     <Form.Group className="mb-3" controlId="registerPassword">
                       <Form.Label className={styles.formLabel}>Contraseña</Form.Label>
                       <Form.Control
                         type="password"
-                        placeholder="Crea una contraseña"
+                        placeholder="Mínimo 6 caracteres"
                         className={styles.formInput}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        disabled={loading} // <-- Deshabilita mientras carga
                       />
                     </Form.Group>
-                    
-                    {/* Campo de Confirmar Contraseña */}
                     <Form.Group className="mb-4" controlId="registerConfirmPassword">
                       <Form.Label className={styles.formLabel}>Confirmar Contraseña</Form.Label>
                       <Form.Control
@@ -114,18 +135,25 @@ export const RegisterPage = () => {
                         className={styles.formInput}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
+                        disabled={loading} // <-- Deshabilita mientras carga
                       />
                     </Form.Group>
 
-                    {/* Botón de Submit (con el gradiente) */}
+                    {/* --- 5. ACTUALIZA EL BOTÓN --- */}
                     <div className="d-grid">
-                      <button type="submit" className="btn-primary-gradient">
-                        Registrarse
+                      <button type="submit" className="btn-primary-gradient" disabled={loading}>
+                        {loading ? (
+                          <>
+                            <Spinner as="span" size="sm" role="status" aria-hidden="true" />
+                            <span className="ms-2">Registrando...</span>
+                          </>
+                        ) : (
+                          'Registrarse'
+                        )}
                       </button>
                     </div>
                   </Form>
 
-                  {/* Enlace de ayuda */}
                   <div className="text-center mt-4">
                     <Link to="/login" className={styles.helperLink}>
                       ¿Ya tienes cuenta? <span className="text-primary">Iniciar Sesión</span>

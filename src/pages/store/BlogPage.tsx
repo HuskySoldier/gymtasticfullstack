@@ -10,7 +10,7 @@ const ArticleCard = ({ post }: { post: BlogPost }) => (
   <Card className={`${styles.blogCard} h-100`}>
     <Card.Img 
       variant="top" 
-      src={post.imageUrl} 
+      src={post.image} 
       alt={post.title} 
       className={styles.cardImage}
     />

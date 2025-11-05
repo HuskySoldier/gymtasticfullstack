@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button, Alert, ListGroup, Image, Spinner } from 'react-bootstrap';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { NavBar } from '../../components/shared/NavBar';
 import { Footer } from '../../components/shared/Footer';
@@ -17,10 +17,11 @@ export const OrderSuccessPage = () => {
   const [loading, setLoading] = useState(true);
 
   // Efecto para limpiar el carrito una vez
+ // Efecto para limpiar el carrito una vez
   useEffect(() => {
     console.log('Compra exitosa, limpiando carrito...');
     clearCart();
-  }, [clearCart]);
+  }, []); // <--- ¡AQUÍ ESTÁ EL CAMBIO! (Deja el array de dependencias vacío)
 
   // Efecto para cargar los datos de la orden
   useEffect(() => {
@@ -86,7 +87,7 @@ export const OrderSuccessPage = () => {
 
   // Si tenemos la orden, la mostramos (Figura 7)
   return (
-    <div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: '#f8f9fa' }}>
+    <div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: 'var(--gym-dark-secondary)' }}>
       <NavBar />
       <main className="flex-grow-1">
         <Container className="py-5">
