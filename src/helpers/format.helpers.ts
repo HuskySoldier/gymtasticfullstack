@@ -14,10 +14,20 @@ export const formatCurrency = (value: number): string => {
  * Formatea el stock para mostrar "Ilimitado" en lugar de "Infinity".
  * Ejemplo: Infinity -> "Ilimitado"
  * Ejemplo: 50 -> "50"
+ * Ejemplo: null -> "No disp."
  */
-export const formatStock = (stock: number): string => {
+export const formatStock = (stock: number | null | undefined): string => {
+  
+  // --- ESTA ES LA LÍNEA NUEVA ---
+  // Si el stock es nulo o indefinido, devuelve un texto alternativo
+  if (stock === null || stock === undefined) {
+    return 'No disp.';
+  }
+  // --- FIN DE LA LÍNEA NUEVA ---
+
   if (stock === Infinity) {
     return 'Ilimitado';
   }
+  
   return stock.toString();
 };
