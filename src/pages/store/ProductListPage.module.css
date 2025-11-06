@@ -1,6 +1,6 @@
 .titleBanner {
-  background-color: var(--gym-primary);
-  color: var(--gym-dark);
+  background-color: var(--gym-primary); /* <-- Será rojo */
+  color: var(--gym-light); /* <-- Texto oscuro (negro) está bien sobre rojo */
   padding: 3rem 0;
   margin-bottom: 3rem;
   text-align: center;
@@ -10,16 +10,23 @@
   font-size: 3.5rem;
 }
 
+
 .breadcrumb {
   background-color: transparent !important;
+  padding-left: 0;
 }
 
 .breadcrumb a {
   text-decoration: none;
-  color: var(--gym-dark);
+  color: var(--gym-text-secondary); /* <-- De negro a gris claro */
   font-weight: 500;
 }
 
 .breadcrumb a:hover {
-  color: var(--gym-primary);
+  color: var(--gym-primary); /* <-- Hover a rojo */
+}
+
+/* También nos aseguramos que el item activo sea blanco */
+.breadcrumb .active {
+  color: var(--gym-light);
 }
