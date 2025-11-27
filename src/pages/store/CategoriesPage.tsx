@@ -32,6 +32,8 @@ export const CategoriesPage = () => {
           setError('Error al cargar las categorías.');
         }
       } catch (err) {
+        // --- CORRECCIÓN: Usamos la variable err ---
+        console.error("Error al obtener categorías:", err);
         setError('Error de conexión.');
       } finally {
         setLoading(false);

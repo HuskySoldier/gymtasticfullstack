@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { NavBar } from '../../components/shared/NavBar';
 import styles from './RegisterPage.module.css';
 import { validateRegistration } from '../../helpers';
-// --- 1. IMPORTA EL SERVICIO DE USUARIO ---
+// --- IMPORTAR SERVICIO ---
 import { createUser } from '../../services/user.service';
 
 export const RegisterPage = () => {
@@ -13,19 +13,20 @@ export const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
   
-  // --- 2. AÑADE UN ESTADO DE CARGA ---
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState(''); // Para feedback visual antes de redirigir
   
   const navigate = useNavigate();
 
-  // --- 3. CONVIERTE LA FUNCIÓN EN ASYNC ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(''); 
-    setLoading(true); // <-- Activa el estado de carga
+    setError('');
+    setSuccessMsg('');
+    setLoading(true);
 
+    // 1. Validación local (Frontend)
     const validationResult = validateRegistration({
       nombre,
       apellidos,
@@ -35,27 +36,37 @@ export const RegisterPage = () => {
     });
 
     if (!validationResult.isValid) {
-      setError(validationResult.message || 'Error de validación desconocido.');
-      setLoading(false); // <-- Detiene la carga si hay error
+      setError(validationResult.message || 'Error de validación.');
+      setLoading(false);
       return;
     }
 
-    // --- 4. LLAMA AL SERVICIO 'createUser' ---
     try {
+      // 2. Llamada al Backend (Register Service)
+      // El servicio real ya devuelve una promesa o lanza error
       await createUser({
-        name: `${nombre.trim()} ${apellidos.trim()}`, // Combina nombre y apellido
+        name: `${nombre.trim()} ${apellidos.trim()}`, // Unimos nombre y apellido para el campo 'name' del front
         email: email.trim(),
         password: password,
-        role: 'Cliente' // Asigna el rol por defecto
+        role: 'Cliente' // Rol por defecto
       });
       
-      // Redirigir al login después del registro exitoso
-      navigate('/login');
+      setSuccessMsg('¡Cuenta creada con éxito! Redirigiendo al login...');
+      
+      // 3. Redirigir al Login tras 1.5 segundos para que el usuario lea el mensaje
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
 
-    } catch (err) {
-      console.error("Error en el registro:", err);
-      setError("Error al registrar el usuario. Inténtalo de nuevo.");
-      setLoading(false); // <-- Detiene la carga si hay error
+} catch (err) {
+      console.error("Error en registro:", err);
+      // Verificamos si 'err' es un objeto Error estándar para acceder a .message
+      const errorMessage = (err instanceof Error) 
+        ? err.message 
+        : "Error al registrar el usuario. Inténtalo más tarde.";
+        
+      setError(errorMessage);
+      setLoading(false);
     }
   };
 
@@ -73,9 +84,9 @@ export const RegisterPage = () => {
                   
                   <Form onSubmit={handleSubmit}>
                     {error && <Alert variant="danger">{error}</Alert>}
+                    {successMsg && <Alert variant="success">{successMsg}</Alert>}
 
                     <Row>
-                      {/* ... (campos de Nombre y Apellidos) ... */}
                       <Col md={6}>
                         <Form.Group className="mb-3" controlId="registerNombre">
                           <Form.Label className={styles.formLabel}>Nombre</Form.Label>
@@ -85,7 +96,7 @@ export const RegisterPage = () => {
                             className={styles.formInput}
                             value={nombre}
                             onChange={(e) => setNombre(e.target.value)}
-                            disabled={loading} // <-- Deshabilita mientras carga
+                            disabled={loading}
                           />
                         </Form.Group>
                       </Col>
@@ -98,13 +109,12 @@ export const RegisterPage = () => {
                             className={styles.formInput}
                             value={apellidos}
                             onChange={(e) => setApellidos(e.target.value)}
-                            disabled={loading} // <-- Deshabilita mientras carga
+                            disabled={loading}
                           />
                         </Form.Group>
                       </Col>
                     </Row>
 
-                    {/* ... (campos de Email, Password, Confirmar) ... */}
                     <Form.Group className="mb-3" controlId="registerEmail">
                       <Form.Label className={styles.formLabel}>Correo Electrónico</Form.Label>
                       <Form.Control
@@ -113,7 +123,7 @@ export const RegisterPage = () => {
                         className={styles.formInput}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        disabled={loading} // <-- Deshabilita mientras carga
+                        disabled={loading}
                       />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="registerPassword">
@@ -124,7 +134,7 @@ export const RegisterPage = () => {
                         className={styles.formInput}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        disabled={loading} // <-- Deshabilita mientras carga
+                        disabled={loading}
                       />
                     </Form.Group>
                     <Form.Group className="mb-4" controlId="registerConfirmPassword">
@@ -135,21 +145,18 @@ export const RegisterPage = () => {
                         className={styles.formInput}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        disabled={loading} // <-- Deshabilita mientras carga
+                        disabled={loading}
                       />
                     </Form.Group>
 
-                    {/* --- 5. ACTUALIZA EL BOTÓN --- */}
                     <div className="d-grid">
                       <button type="submit" className="btn-primary-gradient" disabled={loading}>
                         {loading ? (
-                          <>
-                            <Spinner as="span" size="sm" role="status" aria-hidden="true" />
-                            <span className="ms-2">Registrando...</span>
-                          </>
-                        ) : (
-                          'Registrarse'
-                        )}
+                            <>
+                                <Spinner as="span" size="sm" role="status" aria-hidden="true" className="me-2"/>
+                                Registrando...
+                            </>
+                        ) : 'Registrarse'}
                       </button>
                     </div>
                   </Form>

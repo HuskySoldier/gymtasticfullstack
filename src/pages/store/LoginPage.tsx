@@ -4,19 +4,19 @@ import { useNavigate, Link } from 'react-router-dom';
 import { NavBar } from '../../components/shared/NavBar';
 import styles from './LoginPage.module.css';
 
-// --- 1. IMPORTA LOS HOOKS Y SERVICIOS ---
+// --- 1. AÑADE 'type User' A LAS IMPORTACIONES ---
 import { useAuth } from '../../context/AuthContext';
-import { getUsers } from '../../services/user.service';
+import { loginUserReal, type User } from '../../services/user.service'; 
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // <-- Añadido
+  const [loading, setLoading] = useState(false);
+  
   const navigate = useNavigate();
-  const { login } = useAuth(); // <-- 2. Obtén la función 'login' del contexto
+  const { login } = useAuth(); 
 
-  // --- 3. CONVIERTE LA FUNCIÓN EN ASYNC ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
@@ -29,35 +29,40 @@ export const LoginPage = () => {
     }
 
     try {
-      // --- 4. LÓGICA DE AUTENTICACIÓN (REAL) ---
-      const allUsers = await getUsers();
+      const response = await loginUserReal({ email, password });
       
-      // Busca al usuario por email
-      const foundUser = allUsers.find(
-        (user) => user.email.toLowerCase() === email.toLowerCase()
-      );
-      
-      // Valida la contraseña (Simulada: tu mock no tiene passwords reales,
-      // así que usamos la data hardcodeada que ya tenías como fallback)
-      const passwordIsValid = (email === "admin@gym.com" && password === "admin") || 
-                              (foundUser && password.length > 0); // Simulación de pass correcto
+      if (response && response.success) {
+        const backendUser = response.user;
+        
+        // --- 2. AQUÍ ESTÁ EL CAMBIO: TIPADO EXPLÍCITO ---
+        // Le decimos a TypeScript que este objeto cumple con la interfaz 'User'
+        const userForContext: User = {
+            id: 0, 
+            name: backendUser.nombre,
+            email: backendUser.email,
+            // Aseguramos que el rol sea exactamente uno de los valores permitidos
+            role: (backendUser.rol && backendUser.rol.toLowerCase() === 'admin') ? 'Admin' : 'Cliente',
+            fono: backendUser.fono,
+            avatarUri: backendUser.avatarUri,
+            planEndMillis: backendUser.planEndMillis
+        };
+        
+        // --- 3. ELIMINAMOS EL 'as any' ---
+        login(userForContext); 
 
-      if (foundUser && passwordIsValid) {
-        // --- 5. LLAMA AL CONTEXTO ---
-        login(foundUser); // ¡Aquí guardas al usuario globalmente!
-
-        // Redirige según el rol
-        if (foundUser.role === 'Admin') {
+        if (userForContext.role === 'Admin') {
           navigate('/admin');
         } else {
           navigate('/');
         }
       } else {
-        setError('Correo o contraseña incorrectos.');
+        setError(response?.message || 'Credenciales incorrectas.');
         setLoading(false);
       }
+
     } catch (err) {
-      setError('Error de conexión. Inténtalo de nuevo.');
+      console.error(err);
+      setError('Error de conexión. Inténtalo de nuevo más tarde.');
       setLoading(false);
     }
   };
@@ -101,10 +106,14 @@ export const LoginPage = () => {
                       />
                     </Form.Group>
 
-                    {/* --- 6. ACTUALIZA EL BOTÓN --- */}
                     <div className="d-grid">
                       <button type="submit" className="btn-primary-gradient" disabled={loading}>
-                        {loading ? <Spinner as="span" size="sm" /> : 'Entrar'}
+                        {loading ? (
+                          <>
+                            <Spinner as="span" size="sm" role="status" aria-hidden="true" className="me-2"/>
+                            Entrando...
+                          </>
+                        ) : 'Entrar'}
                       </button>
                     </div>
                   </Form>
@@ -114,7 +123,6 @@ export const LoginPage = () => {
                       ¿No tienes cuenta? <span className="text-primary">Crear una</span>
                     </Link>
                   </div>
-                  {/* ... (resto) ... */}
                 </Card.Body>
               </Card>
             </Col>

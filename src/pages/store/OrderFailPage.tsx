@@ -1,6 +1,8 @@
 import { Container, Row, Col, Card, Button, Alert, ListGroup, Image } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { NavBar } from '../../components/shared/NavBar';
+// --- 1. AÑADIR IMPORTACIÓN ---
+import type { CartItem } from '../../interfaces/app.interfaces';
 
 export const OrderFailPage = () => {
   const location = useLocation();
@@ -8,9 +10,9 @@ export const OrderFailPage = () => {
   
   const order = location.state?.order;
   const orderId = location.state?.orderId;
+  const errorMsg = location.state?.errorMsg; // Opcional: si lo pasaste desde Checkout
 
   const handleTryAgain = () => {
-    // Volvemos al checkout, pasando los datos de la orden para pre-rellenar el formulario
     navigate('/checkout', { state: { order } });
   };
   
@@ -19,14 +21,13 @@ export const OrderFailPage = () => {
   };
 
   if (!order) {
-    // Si no hay 'order' en el 'state', redirigir
     return (
       <div className="bg-dark text-white min-vh-100">
         <NavBar />
         <Container className="text-center py-5">
           <Alert variant="danger">
             <Alert.Heading>Error de Pago</Alert.Heading>
-            <p>No se pudo procesar el pago.</p>
+            <p>No se pudo procesar el pago o no hay información de la orden.</p>
             <Button variant="primary" onClick={handleGoHome}>Volver al Inicio</Button>
           </Alert>
         </Container>
@@ -34,7 +35,6 @@ export const OrderFailPage = () => {
     );
   }
 
-  // Si tenemos la orden, la mostramos (Figura 8)
   return (
     <div className="bg-dark text-white min-vh-100">
       <NavBar />
@@ -48,6 +48,7 @@ export const OrderFailPage = () => {
                 No se pudo realizar el pago
               </Alert.Heading>
               <p className="text-center fs-5">Número de orden: <strong>#{orderId}</strong></p>
+              {errorMsg && <p className="text-center">{errorMsg}</p>}
             </Alert>
             
             <div className="d-grid gap-2 my-4">
@@ -58,29 +59,34 @@ export const OrderFailPage = () => {
             </div>
 
             <Card bg="dark" text="white" className="border-secondary mt-4">
-              <Card.Header as="h5">Detalle de la Compra</Card.Header>
+              <Card.Header as="h5">Detalle de la Compra Fallida</Card.Header>
               <Card.Body>
-                {/* Datos del Cliente */}
                 <h5 className="text-primary">Datos del Cliente</h5>
                 <p className="mb-1"><strong>Nombre:</strong> {order.customer.nombre} {order.customer.apellidos}</p>
                 <p className="mb-1"><strong>Correo:</strong> {order.customer.correo}</p>
                 
                 <hr className="border-secondary" />
                 
-                {/* Dirección de Entrega */}
                 <h5 className="text-primary">Dirección de Entrega</h5>
                 <p className="mb-1">{order.customer.calle}, {order.customer.depto}</p>
                 <p>{order.customer.comuna}, {order.customer.region}</p>
 
                 <hr className="border-secondary" />
 
-                {/* Items Comprados */}
                 <h5 className="text-primary">Productos</h5>
                 <ListGroup variant="flush" className="mb-3">
-                  {order.items.map((item: any) => (
+                  {/* --- 2. USO DE LA INTERFAZ AQUÍ --- */}
+                  {order.items.map((item: CartItem) => (
                     <ListGroup.Item key={item.product.id} className="bg-dark text-white d-flex justify-content-between">
                       <div>
-                        <Image src={item.product.image} style={{ width: '40px' }} rounded className="me-2" />
+                        <Image 
+                            src={item.product.image} 
+                            style={{ width: '40px' }} 
+                            rounded 
+                            className="me-2" 
+                            // Fallback visual por si la imagen es de android
+                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://source.unsplash.com/50x50/?gym'; }}
+                        />
                         {item.product.name} (x{item.quantity})
                       </div>
                       <span className="fw-bold">
@@ -90,7 +96,6 @@ export const OrderFailPage = () => {
                   ))}
                 </ListGroup>
 
-                {/* Total */}
                 <div className="text-end">
                   <h3 className="text-white">
                     Total a Pagar: ${order.total.toLocaleString('es-CL')}

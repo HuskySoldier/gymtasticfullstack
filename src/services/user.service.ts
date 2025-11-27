@@ -1,129 +1,144 @@
+// src/services/user.service.ts
+
 export interface User {
   id: number;
   name: string;
   email: string;
   role: 'Admin' | 'Cliente';
   password?: string; 
+  // Nuevos campos opcionales para el perfil
+  fono?: string;
+  avatarUri?: string;
+  planEndMillis?: number;
 }
 
-// --- 1. Definimos la llave para el localStorage ---
-const USERS_STORAGE_KEY = 'gymtastic_users_db';
+// --- 1. DEFINIMOS LA INTERFAZ DEL BACKEND (Java DTO) ---
+interface BackendUser {
+  email: string;
+  nombre: string;
+  rol: string;
+  fono?: string;
+  avatarUri?: string;
+  planEndMillis?: number;
+  // Otros campos que vienen del backend pero quizás no usamos aun:
+  sedeId?: number;
+  sedeName?: string;
+  bio?: string;
+}
 
-// --- 2. Definimos los usuarios iniciales (solo para la primera carga) ---
-const INITIAL_MOCK_USERS: User[] = [
-  { id: 1, name: 'Pedro Hacker', email: 'pedro.hacker20@example.com', role: 'Cliente', password: '123' },
-  { id: 2, name: 'Admin GYMTASTIC', email: 'admin@gym.com', role: 'Admin', password: 'admin' },
-  { id: 3, name: 'Jane Doe', email: 'jane.doe@example.com', role: 'Cliente', password: '123' },
-];
+// URLs de tus microservicios
+const USER_API = 'http://localhost:8082/users';
+const REGISTER_API = 'http://localhost:8084/register';
+const LOGIN_API = 'http://localhost:8083/login';
 
-// --- 3. HELPER: Obtener usuarios de localStorage ---
-const getUsersFromStorage = (): User[] => {
-  try {
-    const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
-    // Si hay usuarios guardados, los devolvemos
-    if (storedUsers) {
-      return JSON.parse(storedUsers);
+// --- 2. USAMOS LA INTERFAZ EN EL MAPPER ---
+const mapUser = (data: BackendUser): User => ({
+  id: 0, // Placeholder numérico
+  name: data.nombre,
+  email: data.email,
+  role: (data.rol && data.rol.toLowerCase() === 'admin') ? 'Admin' : 'Cliente',
+  fono: data.fono,
+  avatarUri: data.avatarUri,
+  planEndMillis: data.planEndMillis
+});
+
+// --- FUNCIÓN PARA EL LOGIN ---
+export const loginUserReal = async (credentials: {email:string, password:string}) => {
+    try {
+        const response = await fetch(LOGIN_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(credentials)
+        });
+        
+        if(!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            return { success: false, message: errorData.message || 'Error de credenciales' };
+        }
+        
+        return await response.json(); // Devuelve { success, token, user: BackendUser }
+    } catch (error) {
+        console.error("Error en loginUserReal:", error);
+        return { success: false, message: 'Error de conexión con el servidor' };
     }
-  } catch (error) {
-    console.error("Error al leer usuarios de localStorage", error);
-    localStorage.removeItem(USERS_STORAGE_KEY); // Limpia datos corruptos
+};
+
+export const createUser = async (userData: Omit<User, 'id'>): Promise<User> => {
+  const payload = {
+    nombre: userData.name,
+    email: userData.email,
+    password: userData.password
+  };
+
+  const response = await fetch(REGISTER_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.message || 'Error al registrar usuario');
   }
   
-  // Si no hay nada, guardamos y devolvemos la lista inicial
-  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(INITIAL_MOCK_USERS));
-  return INITIAL_MOCK_USERS;
+  return { ...userData, id: 0, role: 'Cliente' } as User;
 };
 
-// --- 4. HELPER: Guardar usuarios en localStorage ---
-const saveUsersToStorage = (users: User[]): void => {
+export const getUsers = async (): Promise<User[]> => {
   try {
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-  } catch (error) {
-    console.error("Error al guardar usuarios en localStorage", error);
+    const response = await fetch(USER_API); 
+    if (!response.ok) return [];
+    
+    // --- 3. TIPAMOS LA RESPUESTA JSON ---
+    const data: BackendUser[] = await response.json();
+    return data.map(mapUser);
+  } catch (e) {
+    console.error(e);
+    return [];
   }
 };
 
-// --- 5. Nuestra "BBDD" en memoria ahora lee de localStorage ---
-let mockUsers: User[] = getUsersFromStorage();
-
-// Calculamos el siguiente ID basado en lo que cargamos
-let nextId = Math.max(...mockUsers.map(u => u.id)) + 1;
-
-/**
- * Obtiene todos los usuarios (desde la variable en memoria).
- */
-export const getUsers = async (): Promise<User[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([...mockUsers]); // Devuelve una copia
-    }, 100); // Hacemos la simulación más rápida
-  });
-};
-
-/**
- * Obtiene un usuario por su ID (desde la variable en memoria).
- */
 export const getUserById = async (id: number): Promise<User | null> => {
-  return new Promise((resolve) => {
-    const user = mockUsers.find(u => u.id === id);
-    setTimeout(() => {
-      resolve(user || null);
-    }, 100);
-  });
+    const users = await getUsers();
+    return users.find(u => u.id === id) || null;
 };
 
-/**
- * Crea un nuevo usuario y LO GUARDA EN LOCALSTORAGE.
- */
-export const createUser = async (userData: Omit<User, 'id'>): Promise<User> => {
-  return new Promise((resolve) => {
-    const newUser: User = { ...userData, id: nextId++ };
-    
-    mockUsers.push(newUser); // Actualiza la variable
-    saveUsersToStorage(mockUsers); // <--- GUARDA EN LOCALSTORAGE
-    
-    setTimeout(() => {
-      resolve(newUser);
-    }, 200);
-  });
-};
+export const updateUser = async (id: number, updates: Partial<User>): Promise<User | null> => {
+    if(!updates.email) return null;
 
-/**
- * Actualiza un usuario existente y LO GUARDA EN LOCALSTORAGE.
- */
-export const updateUser = async (id: number, updates: Partial<Omit<User, 'id'>>): Promise<User | null> => {
-  return new Promise((resolve) => {
-    const index = mockUsers.findIndex(user => user.id === id);
-    if (index !== -1) {
-      mockUsers[index] = { ...mockUsers[index], ...updates }; // Actualiza la variable
-      
-      saveUsersToStorage(mockUsers); // <--- GUARDA EN LOCALSTORAGE
-      
-      setTimeout(() => {
-        resolve(mockUsers[index]);
-      }, 200);
-    } else {
-      resolve(null);
+    const payload = {
+        nombre: updates.name,
+        fono: updates.fono,
+        bio: '', 
+        avatarUri: updates.avatarUri
+    };
+
+    try {
+        const response = await fetch(`${USER_API}/${updates.email}/profile`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if(response.ok) {
+            const updatedData: BackendUser = await response.json();
+            return mapUser(updatedData);
+        }
+    } catch (e) {
+        console.error(e);
     }
-  });
+    return null;
 };
 
-/**
- * Elimina un usuario y LO GUARDA EN LOCALSTORAGE.
- */
 export const deleteUser = async (id: number): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const index = mockUsers.findIndex(user => user.id === id);
-    if (index !== -1) {
-      mockUsers.splice(index, 1); // Actualiza la variable
-      
-      saveUsersToStorage(mockUsers); // <--- GUARDA EN LOCALSTORAGE
-      
-      setTimeout(() => {
-        resolve(true);
-      }, 200);
-    } else {
-      resolve(false);
+    const user = await getUserById(id);
+    if(!user) return false;
+
+    try {
+        const response = await fetch(`${USER_API}/${user.email}`, { method: 'DELETE' });
+        return response.ok;
+    } catch (e) {
+        console.error(e);
+        return false;
     }
-  });
 };

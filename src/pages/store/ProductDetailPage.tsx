@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom'; // Asegúrate de importar Link si usas Breadcrumb
 import { Container, Row, Col, Image, Button, Spinner, Alert, Breadcrumb } from 'react-bootstrap';
 import { getProductById } from '../../services/product.service';
 import type { Product } from '../../interfaces/app.interfaces';
 import { useCart } from '../../context/CartContext';
 import { NavBar } from '../../components/shared/NavBar';
 
-// Este componente reemplaza a RobotComponent.tsx
 export const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -35,6 +34,8 @@ export const ProductDetailPage = () => {
             setError('Producto no encontrado.');
           }
         } catch (err) {
+          // --- CORRECCIÓN: Uso de la variable err ---
+          console.error("Error cargando producto:", err);
           setError('Error de conexión al cargar el producto.');
         } finally {
           setLoading(false);
@@ -48,7 +49,6 @@ export const ProductDetailPage = () => {
   const handleAddToCart = () => {
     if (product) {
       addToCart(product, 1);
-      // Opcional: Redirigir al carrito o mostrar notificación
       navigate('/carrito');
     }
   };
@@ -77,7 +77,14 @@ export const ProductDetailPage = () => {
         backdropFilter: 'blur(10px)',
       }}>
         <Col md={6}>
-          <Image src={product.image} alt={product.name} fluid rounded />
+          {/* Manejo de error de imagen (fallback) */}
+          <Image 
+            src={product.image} 
+            alt={product.name} 
+            fluid 
+            rounded 
+            onError={(e) => { (e.target as HTMLImageElement).src = 'https://source.unsplash.com/400x400/?gym'; }}
+          />
         </Col>
         <Col md={6}>
           <h1 className="display-4 fw-bold text-primary">{product.name}</h1>
@@ -102,7 +109,7 @@ export const ProductDetailPage = () => {
             </Button>
             <Button 
               variant="outline-light" 
-              onClick={() => navigate(-1)} // Volver atrás
+              onClick={() => navigate(-1)}
             >
               <i className="fa-solid fa-arrow-left me-2"></i>
               Volver
@@ -117,8 +124,9 @@ export const ProductDetailPage = () => {
     <div className="bg-dark text-white min-vh-100">
       <NavBar />
       <Container className="py-5">
+        {/* Se agregó Link en Breadcrumb para evitar recargas completas */}
         <Breadcrumb listProps={{ className: 'breadcrumb-dark' }}>
-          <Breadcrumb.Item onClick={() => navigate('/')}>Home</Breadcrumb.Item>
+          <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/" }}>Home</Breadcrumb.Item>
           <Breadcrumb.Item active>{product?.name || 'Producto'}</Breadcrumb.Item>
         </Breadcrumb>
         {renderContent()}

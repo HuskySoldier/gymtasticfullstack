@@ -1,167 +1,182 @@
-import { MOCK_PRODUCTS } from '../data/mock-db';
 import type { Product, AllProductsResponse, SingleProductResponse } from '../interfaces/app.interfaces';
 
-// --- 1. Definimos la llave y los helpers de localStorage ---
-const PRODUCTS_STORAGE_KEY = 'gymtastic_products_db';
+const API_URL = 'http://localhost:8081/products';
 
-const getProductsFromStorage = (): Product[] => {
-  try {
-    const storedProducts = localStorage.getItem(PRODUCTS_STORAGE_KEY);
-    if (storedProducts) {
-      return JSON.parse(storedProducts);
+// --- DEFINICIÓN DE TIPOS DE BACKEND ---
+interface BackendProduct {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  precio: number;
+  stock?: number | null;
+  img?: string;
+  tipo?: string;
+}
+
+// --- HELPER: Mapear de Backend a Frontend ---
+const mapToFrontend = (data: BackendProduct): Product => {
+  // Definimos el tipo explícito para reutilizarlo si es necesario
+  type CategoryType = 'Membresías' | 'Suplementos' | 'Ropa' | 'Equipamiento';
+  
+  let mappedCategory: CategoryType = 'Suplementos'; 
+  let cleanDescription = data.descripcion || '';
+
+  // 1. ESTRATEGIA INTELIGENTE
+  // Usamos 'as const' para que TS sepa que son estos valores exactos y no strings genéricos
+  const categories = ['Membresías', 'Suplementos', 'Ropa', 'Equipamiento'] as const;
+  
+  let foundTag = false;
+
+  for (const cat of categories) {
+    const tag = `[${cat}]`;
+    if (cleanDescription.startsWith(tag)) {
+      mappedCategory = cat; // ¡Ya no se necesita 'as any'!
+      cleanDescription = cleanDescription.replace(tag, '').trim(); 
+      foundTag = true;
+      break;
     }
-  } catch (error) {
-    console.error("Error al leer productos de localStorage", error);
-    localStorage.removeItem(PRODUCTS_STORAGE_KEY);
   }
-  
-  // Si no hay nada, cargamos el MOCK inicial
-  localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(MOCK_PRODUCTS));
-  return MOCK_PRODUCTS;
+
+  // 2. ESTRATEGIA LEGACY (Respaldo)
+  if (!foundTag) {
+    if (data.tipo?.toLowerCase() === 'plan') {
+      mappedCategory = 'Membresías';
+    } else if (cleanDescription.toLowerCase().includes('ropa') || cleanDescription.toLowerCase().includes('polera') || cleanDescription.toLowerCase().includes('leggings')) {
+      mappedCategory = 'Ropa';
+    } else if (cleanDescription.toLowerCase().includes('mancuerna') || cleanDescription.toLowerCase().includes('peso') || cleanDescription.toLowerCase().includes('barra')) {
+      mappedCategory = 'Equipamiento';
+    }
+  }
+
+  return {
+    id: data.id,
+    name: data.nombre,
+    description: cleanDescription,
+    image: (data.img && data.img.startsWith('http')) ? data.img : 'https://source.unsplash.com/random?gym',
+    price: data.precio,
+    stock: (data.stock === null || data.stock === undefined) ? Infinity : data.stock,
+    category: mappedCategory
+  };
 };
 
-const saveProductsToStorage = (products: Product[]): void => {
-  try {
-    localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(products));
-  } catch (error) {
-    console.error("Error al guardar productos en localStorage", error);
-  }
-};
-
-// --- 2. Nuestra "BBDD" en memoria ahora lee de localStorage ---
-let productsDB: Product[] = getProductsFromStorage();
-
-/**
- * Obtiene todos los productos.
- */
 export const getProducts = async (): Promise<AllProductsResponse> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        ok: true,
-        statusCode: 200,
-        products: productsDB,
-      });
-    }, 300); // Reducido el delay
-  });
+  try {
+    const response = await fetch(API_URL);
+    if (!response.ok) throw new Error('Error fetching products');
+    const data: BackendProduct[] = await response.json();
+    const products = data.map(mapToFrontend);
+    return { ok: true, statusCode: 200, products };
+  } catch (error) {
+    console.error(error);
+    return { ok: false, statusCode: 500, products: [] };
+  }
 };
 
-/**
- * Obtiene un producto por su ID.
- */
 export const getProductById = async (id: number): Promise<SingleProductResponse> => {
-  return new Promise((resolve) => {
-    const product = productsDB.find(p => p.id === id);
-    setTimeout(() => {
-      if (product) {
-        resolve({ ok: true, statusCode: 200, product: product });
-      } else {
-        resolve({ ok: false, statusCode: 404, product: undefined });
-      }
-    }, 300);
-  });
-};
+  try {
+    const response = await fetch(API_URL); 
+    const data: BackendProduct[] = await response.json();
+    const productBackend = data.find((p) => p.id === id);
 
-/**
- * Crea un nuevo producto y lo guarda en localStorage.
- */
-export const createProduct = async (newProductData: Omit<Product, 'id'>): Promise<SingleProductResponse> => {
-  const newId = Math.max(0, ...productsDB.map(p => p.id)) + 1; // Asegura que funcione si la BBDD está vacía
-  const newProduct: Product = { ...newProductData, id: newId };
-  
-  productsDB.push(newProduct);
-  saveProductsToStorage(productsDB); // <--- GUARDA
-  
-  return {
-    ok: true,
-    statusCode: 201,
-    product: newProduct,
-  };
-};
-
-/**
- * Actualiza un producto y lo guarda en localStorage.
- */
-export const updateProduct = async (id: number, updates: Partial<Product>): Promise<SingleProductResponse> => {
-  const productIndex = productsDB.findIndex(p => p.id === id);
-
-  if (productIndex === -1) {
-    return { ok: false, statusCode: 404, product: undefined };
-  }
-
-  const updatedProduct = { ...productsDB[productIndex], ...updates };
-  productsDB[productIndex] = updatedProduct;
-  
-  saveProductsToStorage(productsDB); // <--- GUARDA
-  
-  return {
-    ok: true,
-    statusCode: 200,
-    product: updatedProduct,
-  };
-};
-
-/**
- * Elimina un producto y guarda en localStorage.
- */
-export const deleteProduct = async (id: number): Promise<{ ok: boolean; statusCode: number }> => {
-  const productIndex = productsDB.findIndex(p => p.id === id);
-
-  if (productIndex === -1) {
+    if (productBackend) {
+      return { ok: true, statusCode: 200, product: mapToFrontend(productBackend) };
+    }
     return { ok: false, statusCode: 404 };
+  } catch (error) {
+    console.error("Error getting product:", error);
+    return { ok: false, statusCode: 500 };
   }
-
-  productsDB.splice(productIndex, 1);
-  saveProductsToStorage(productsDB); // <--- GUARDA
-  
-  return { ok: true, statusCode: 204 };
 };
 
 export const getProductsByCategory = async (categoryName: string): Promise<AllProductsResponse> => {
-  // ... (Esta función no cambia)
-  return new Promise((resolve) => {
-    const lowerCaseCategory = categoryName.toLowerCase();
-    const filteredProducts = productsDB.filter(
-      (product) => product.category.toLowerCase() === lowerCaseCategory
-    );
-    setTimeout(() => {
-      resolve({ ok: true, statusCode: 200, products: filteredProducts });
-    }, 300);
-  });
+  try {
+    const response = await getProducts(); 
+    const filtered = response.products.filter(p => {
+        return p.category.toLowerCase() === categoryName.toLowerCase();
+    });
+    return { ok: true, statusCode: 200, products: filtered };
+  } catch (error) {
+    console.error("Error getting products by category:", error);
+    return { ok: false, statusCode: 500, products: [] };
+  }
 };
 
+export const createProduct = async (product: Omit<Product, 'id'>): Promise<SingleProductResponse> => {
+  try {
+    const taggedDescription = `[${product.category}] ${product.description}`;
 
-// --- 3. NUEVA FUNCIÓN PARA REDUCIR STOCK ---
-/**
- * Reduce el stock de un producto específico.
- * Esta función es llamada por el servicio de Órdenes.
- */
-export const reduceStock = async (productId: number, quantityToReduce: number): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const productIndex = productsDB.findIndex(p => p.id === productId);
-
-    if (productIndex === -1) {
-      resolve(false); // Producto no encontrado
-      return;
-    }
-
-    const product = productsDB[productIndex];
-
-    // No reducir stock de membresías (Infinity)
-    if (product.stock === Infinity) {
-      resolve(true); // Éxito (no se hace nada)
-      return;
-    }
-
-    const newStock = product.stock - quantityToReduce;
-    
-    // Actualiza el producto
-    productsDB[productIndex] = {
-      ...product,
-      stock: newStock < 0 ? 0 : newStock, // Asegura que el stock no sea negativo
+    const backendProduct: Partial<BackendProduct> = {
+      nombre: product.name,
+      descripcion: taggedDescription, 
+      precio: product.price,
+      stock: product.stock === Infinity ? 9999 : product.stock,
+      img: product.image,
+      tipo: product.category === 'Membresías' ? 'plan' : 'merch'
     };
 
-    saveProductsToStorage(productsDB); // <--- GUARDA EL NUEVO STOCK
-    resolve(true);
-  });
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(backendProduct)
+    });
+
+    if (response.ok) {
+      const newProduct: BackendProduct = await response.json();
+      return { ok: true, statusCode: 201, product: mapToFrontend(newProduct) };
+    }
+    return { ok: false, statusCode: response.status };
+  } catch (error) {
+    console.error("Error creating product:", error);
+    return { ok: false, statusCode: 500 };
+  }
+};
+
+export const updateProduct = async (id: number, updates: Partial<Product>): Promise<SingleProductResponse> => {
+  try {
+    const backendUpdates: Partial<BackendProduct> = {};
+    
+    if(updates.name) backendUpdates.nombre = updates.name;
+    
+    if(updates.description || updates.category) {
+       if (updates.category && updates.description) {
+           backendUpdates.descripcion = `[${updates.category}] ${updates.description}`;
+       } else if (updates.description) {
+           backendUpdates.descripcion = updates.description; 
+       }
+    }
+
+    if(updates.price) backendUpdates.precio = updates.price;
+    if(updates.stock) backendUpdates.stock = updates.stock === Infinity ? 9999 : updates.stock;
+    if(updates.image) backendUpdates.img = updates.image;
+    
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(backendUpdates)
+    });
+
+    if (response.ok) {
+      const updated: BackendProduct = await response.json();
+      return { ok: true, statusCode: 200, product: mapToFrontend(updated) };
+    }
+    return { ok: false, statusCode: response.status };
+  } catch (error) {
+    console.error("Error updating product:", error);
+    return { ok: false, statusCode: 500 };
+  }
+};
+
+export const deleteProduct = async (id: number): Promise<{ ok: boolean; statusCode: number }> => {
+  try {
+    const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    return { ok: response.ok, statusCode: response.status };
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    return { ok: false, statusCode: 500 };
+  }
+};
+
+export const reduceStock = async (productId: number, quantity: number): Promise<boolean> => {
+  console.log(`(Simulado) Reduciendo stock para ID ${productId}: cantidad ${quantity}`);
+  return true; 
 };
