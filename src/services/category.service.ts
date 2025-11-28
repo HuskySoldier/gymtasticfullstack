@@ -4,7 +4,7 @@ export interface Category {
 }
 
 // Simulación de BBDD en memoria. Esta es ahora la "fuente de verdad".
-let mockCategories: Category[] = [
+const mockCategories: Category[] = [
   { id: 1, name: 'Membresías' },
   { id: 2, name: 'Suplementos' },
   { id: 3, name: 'Ropa' },
