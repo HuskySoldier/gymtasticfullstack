@@ -21,6 +21,7 @@ export const AdminProductCreate = () => {
       } else {
         setError('Error al crear el producto.');
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Error de conexión al crear.');
     }

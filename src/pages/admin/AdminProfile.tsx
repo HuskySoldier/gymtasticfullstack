@@ -29,6 +29,7 @@ export const AdminProfile = () => {
         } else {
           setError('No se pudo cargar el perfil del administrador.');
         }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setError('Error de conexión al cargar el perfil.');
       } finally {
@@ -67,6 +68,7 @@ export const AdminProfile = () => {
       // Limpiar campos de contraseña
       setPassword('');
       setConfirmPassword('');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Error al actualizar el perfil.');
     } finally {

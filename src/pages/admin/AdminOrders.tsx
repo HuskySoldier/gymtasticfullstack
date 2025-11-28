@@ -79,6 +79,7 @@ export const AdminOrders = () => {
         setError(null);
         const data = await getOrders();
         setOrders(data);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setError('Error al cargar las órdenes.');
       } finally {

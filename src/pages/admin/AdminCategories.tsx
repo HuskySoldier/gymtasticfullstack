@@ -28,6 +28,7 @@ export const AdminCategories = () => {
       setLoading(true);
       const data = await getCategories();
       setCategories(data);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Error al cargar categorías.');
     } finally {
@@ -61,6 +62,7 @@ export const AdminCategories = () => {
       }
       handleClearForm();
       await fetchCategories(); // Recargar la lista
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Error al guardar la categoría.');
     } finally {
@@ -91,6 +93,7 @@ export const AdminCategories = () => {
     try {
       await deleteCategory(categoryToDelete.id);
       await fetchCategories(); // Recargar la lista
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Error al eliminar la categoría.');
     } finally {

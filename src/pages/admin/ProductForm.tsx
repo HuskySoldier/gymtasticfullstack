@@ -77,7 +77,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit,
                 <Form.Select
                   className={formStyles.formInput}
                   value={category}
-                  onChange={(e) => setCategory(e.target.value as any)}
+                  onChange={(e) => setCategory(e.target.value as never)}
                   required
                 >
                   <option value="Membresías">Membresías</option>

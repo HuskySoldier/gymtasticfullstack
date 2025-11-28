@@ -37,6 +37,7 @@ export const AdminProducts = () => {
       } else {
         setError('Error al cargar los productos.');
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Error de conexión con el servicio.');
     } finally {
@@ -68,6 +69,7 @@ export const AdminProducts = () => {
       } else {
         setError('No se pudo eliminar el producto.');
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Error de conexión al eliminar.');
     } finally {

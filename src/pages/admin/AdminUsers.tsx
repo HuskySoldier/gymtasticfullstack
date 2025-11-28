@@ -47,6 +47,7 @@ export const AdminUsers = () => {
       setLoading(true);
       const data = await getUsers();
       setUsers(data);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Error al cargar usuarios.');
     } finally {
@@ -97,6 +98,7 @@ export const AdminUsers = () => {
       }
       handleClearForm();
       await fetchUsers(); // Recargar la lista
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Error al guardar el usuario.');
     } finally {
@@ -132,6 +134,7 @@ export const AdminUsers = () => {
     try {
       await deleteUser(userToDelete.id);
       await fetchUsers(); // Recargar la lista
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Error al eliminar el usuario.');
     } finally {

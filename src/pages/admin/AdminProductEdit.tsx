@@ -29,6 +29,7 @@ export const AdminProductEdit = () => {
         } else {
           setError('Producto no encontrado.');
         }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setError('Error de conexión.');
       } finally {
@@ -51,6 +52,7 @@ export const AdminProductEdit = () => {
       } else {
         setError('Error al actualizar el producto.');
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError('Error de conexión al actualizar.');
     }
