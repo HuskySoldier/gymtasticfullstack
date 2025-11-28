@@ -1,18 +1,23 @@
-// src/services/user.service.ts
-
 export interface User {
   id: number;
   name: string;
   email: string;
   role: 'Admin' | 'Cliente';
   password?: string; 
-  // Nuevos campos opcionales para el perfil
   fono?: string;
   avatarUri?: string;
   planEndMillis?: number;
 }
 
-// --- 1. DEFINIMOS LA INTERFAZ DEL BACKEND (Java DTO) ---
+// --- HELPER: Obtener cabeceras con Token ---
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('gym_token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : ''
+  };
+};
+
 interface BackendUser {
   email: string;
   nombre: string;
@@ -20,10 +25,7 @@ interface BackendUser {
   fono?: string;
   avatarUri?: string;
   planEndMillis?: number;
-  // Otros campos que vienen del backend pero quizás no usamos aun:
-  sedeId?: number;
-  sedeName?: string;
-  bio?: string;
+  passHash?: string;
 }
 
 // URLs de tus microservicios
@@ -31,9 +33,8 @@ const USER_API = 'http://localhost:8082/users';
 const REGISTER_API = 'http://localhost:8084/register';
 const LOGIN_API = 'http://localhost:8083/login';
 
-// --- 2. USAMOS LA INTERFAZ EN EL MAPPER ---
 const mapUser = (data: BackendUser): User => ({
-  id: 0, // Placeholder numérico
+  id: 0, 
   name: data.nombre,
   email: data.email,
   role: (data.rol && data.rol.toLowerCase() === 'admin') ? 'Admin' : 'Cliente',
@@ -42,7 +43,7 @@ const mapUser = (data: BackendUser): User => ({
   planEndMillis: data.planEndMillis
 });
 
-// --- FUNCIÓN PARA EL LOGIN ---
+// --- PÚBLICO: Login (Recibe el token, no lo envía) ---
 export const loginUserReal = async (credentials: {email:string, password:string}) => {
     try {
         const response = await fetch(LOGIN_API, {
@@ -56,13 +57,14 @@ export const loginUserReal = async (credentials: {email:string, password:string}
             return { success: false, message: errorData.message || 'Error de credenciales' };
         }
         
-        return await response.json(); // Devuelve { success, token, user: BackendUser }
+        return await response.json(); 
     } catch (error) {
         console.error("Error en loginUserReal:", error);
         return { success: false, message: 'Error de conexión con el servidor' };
     }
 };
 
+// --- PÚBLICO: Registro ---
 export const createUser = async (userData: Omit<User, 'id'>): Promise<User> => {
   const payload = {
     nombre: userData.name,
@@ -84,12 +86,14 @@ export const createUser = async (userData: Omit<User, 'id'>): Promise<User> => {
   return { ...userData, id: 0, role: 'Cliente' } as User;
 };
 
+// --- PROTEGIDO: Obtener Usuarios (Admin) ---
 export const getUsers = async (): Promise<User[]> => {
   try {
-    const response = await fetch(USER_API); 
+    const response = await fetch(USER_API, {
+        headers: getAuthHeaders() // <--- Token incluido
+    }); 
     if (!response.ok) return [];
     
-    // --- 3. TIPAMOS LA RESPUESTA JSON ---
     const data: BackendUser[] = await response.json();
     return data.map(mapUser);
   } catch (e) {
@@ -98,11 +102,15 @@ export const getUsers = async (): Promise<User[]> => {
   }
 };
 
+// --- PROTEGIDO: Obtener Usuario por ID (Simulado buscando por email en la lista o endpoint específico) ---
 export const getUserById = async (id: number): Promise<User | null> => {
+    // Nota: Como tu User tiene ID numérico en front pero string email en backend,
+    // esto es una adaptación. Idealmente deberías buscar por email.
     const users = await getUsers();
     return users.find(u => u.id === id) || null;
 };
 
+// --- PROTEGIDO: Actualizar Perfil ---
 export const updateUser = async (_id: number, updates: Partial<User>): Promise<User | null> => {
     if(!updates.email) return null;
 
@@ -116,7 +124,7 @@ export const updateUser = async (_id: number, updates: Partial<User>): Promise<U
     try {
         const response = await fetch(`${USER_API}/${updates.email}/profile`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(), // <--- Token incluido
             body: JSON.stringify(payload)
         });
 
@@ -130,12 +138,17 @@ export const updateUser = async (_id: number, updates: Partial<User>): Promise<U
     return null;
 };
 
+// --- PROTEGIDO: Eliminar Usuario (Admin) ---
 export const deleteUser = async (id: number): Promise<boolean> => {
+    // Primero necesitamos el email para borrar en el backend
     const user = await getUserById(id);
     if(!user) return false;
 
     try {
-        const response = await fetch(`${USER_API}/${user.email}`, { method: 'DELETE' });
+        const response = await fetch(`${USER_API}/${user.email}`, { 
+            method: 'DELETE',
+            headers: getAuthHeaders() // <--- Token incluido
+        });
         return response.ok;
     } catch (e) {
         console.error(e);
