@@ -103,7 +103,7 @@ export const getUserById = async (id: number): Promise<User | null> => {
     return users.find(u => u.id === id) || null;
 };
 
-export const updateUser = async (id: number, updates: Partial<User>): Promise<User | null> => {
+export const updateUser = async (_id: number, updates: Partial<User>): Promise<User | null> => {
     if(!updates.email) return null;
 
     const payload = {
