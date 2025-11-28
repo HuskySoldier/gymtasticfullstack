@@ -1,42 +1,38 @@
+// src/services/order.service.ts
 import type { Order, CustomerDetails, CartItem } from '../interfaces/app.interfaces';
 
-const CHECKOUT_API = 'http://localhost:8086'; // Base URL
+const CHECKOUT_API = 'http://localhost:8086'; 
 
-// Helper para mapear la respuesta del backend (OrderDto) a la interfaz Order del frontend
+// Helper para mapear DTO de backend a Frontend
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mapBackendOrderToFrontend = (backendOrder: any): Order => {
   return {
     id: backendOrder.id.toString(),
-    date: backendOrder.date, // Formato ISO que viene de Java
+    date: backendOrder.date,
     total: backendOrder.totalAmount,
-    status: 'Completado', // El backend actual no maneja estados, asumimos completado
-    
-    // Reconstruimos datos del cliente con lo que tenemos (el email)
+    status: 'Completado', 
     customer: {
-      nombre: 'Cliente', // No guardamos el nombre en la orden, solo el email
+      nombre: 'Cliente',
       apellidos: '',
       correo: backendOrder.userEmail,
-      calle: 'Dirección guardada en perfil', // Dato no disponible en este endpoint
+      calle: 'Dirección registrada',
       depto: '',
       region: '',
       comuna: ''
     },
-
-    // Reconstruimos un item genérico con la descripción
-    items: [
-      {
+    // Reconstrucción genérica de items para visualización en lista
+    items: Array(backendOrder.itemsCount || 1).fill({
         product: {
-          id: 0,
-          name: backendOrder.description || 'Compra Gymtastic',
-          description: '',
-          image: 'https://source.unsplash.com/50x50/?gym', // Imagen genérica
-          price: backendOrder.totalAmount,
-          stock: 0,
-          category: 'Equipamiento' // Valor por defecto
+            id: 0,
+            name: backendOrder.description || 'Items Varios',
+            description: '',
+            image: 'https://source.unsplash.com/50x50/?gym',
+            price: 0, 
+            stock: 0,
+            category: 'Equipamiento'
         },
         quantity: 1
-      }
-    ]
+    })
   };
 };
 
@@ -45,9 +41,6 @@ export const createOrder = async (
   items: CartItem[], 
   total: number
 ): Promise<Order> => {
-  
-  // ... (El código de createOrder se mantiene IGUAL que en la respuesta anterior) ...
-  // Solo asegúrate de que apunte a `${CHECKOUT_API}/checkout`
   
   const itemsPayload = items.map(item => ({
     productId: item.product.id,
@@ -82,6 +75,7 @@ export const createOrder = async (
     throw new Error(errorData.message || 'Error al procesar el pago');
   }
 
+  // Devolvemos una orden confirmada con ID temporal generado por backend o timestamp
   return {
     id: `ORD-${Date.now()}`, 
     date: new Date().toISOString(),
@@ -92,28 +86,25 @@ export const createOrder = async (
   };
 };
 
-// --- FUNCIÓN ACTUALIZADA PARA ADMIN ---
 export const getOrders = async (): Promise<Order[]> => {
   try {
-    // Llamamos al nuevo endpoint del backend
     const response = await fetch(`${CHECKOUT_API}/orders`);
-    
-    if (!response.ok) {
-      console.error('Error fetching orders');
-      return [];
-    }
-
+    if (!response.ok) return [];
     const data = await response.json();
-    // Mapeamos cada orden del backend al formato del frontend
     return data.map(mapBackendOrderToFrontend);
-
   } catch (error) {
     console.error(error);
     return [];
   }
 };
 
+// Implementación real (busca en todos y filtra)
 export const getOrderById = async (id: string): Promise<Order | null> => {
-    console.log("Buscando orden por ID (simulado):", id);
-    return null; 
+    try {
+        const allOrders = await getOrders();
+        return allOrders.find(o => o.id === id) || null;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
 };

@@ -4,18 +4,17 @@ import { useNavigate, Link } from 'react-router-dom';
 import { NavBar } from '../../components/shared/NavBar';
 import styles from './LoginPage.module.css';
 
-// --- 1. AÑADE 'type User' A LAS IMPORTACIONES ---
 import { useAuth } from '../../context/AuthContext';
-import { loginUserReal, type User } from '../../services/user.service'; 
+import { loginUserReal, type User } from '../../services/user.service';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const navigate = useNavigate();
-  const { login } = useAuth(); 
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,31 +29,39 @@ export const LoginPage = () => {
 
     try {
       const response = await loginUserReal({ email, password });
-      
-      if (response && response.success) {
-        const backendUser = response.user;
-        
-        // --- 2. AQUÍ ESTÁ EL CAMBIO: TIPADO EXPLÍCITO ---
-        // Le decimos a TypeScript que este objeto cumple con la interfaz 'User'
-        const userForContext: User = {
-            id: 0, 
-            name: backendUser.nombre,
-            email: backendUser.email,
-            // Aseguramos que el rol sea exactamente uno de los valores permitidos
-            role: (backendUser.rol && backendUser.rol.toLowerCase() === 'admin') ? 'Admin' : 'Cliente',
-            fono: backendUser.fono,
-            avatarUri: backendUser.avatarUri,
-            planEndMillis: backendUser.planEndMillis
-        };
-        
-        // --- 3. ELIMINAMOS EL 'as any' ---
-        login(userForContext); 
 
+      if (response && response.success) {
+        
+        const backendUser = response.user;
+        const token = response.token;
+
+        // 1️⃣ Guardar token JWT en LocalStorage
+        localStorage.setItem('gym_token', token);
+
+        // 2️⃣ Transformar datos del backend al modelo User del Front
+        const userForContext: User = {
+          id: backendUser.id ?? 0,
+          name: backendUser.nombre,
+          email: backendUser.email,
+          role:
+            backendUser.rol && backendUser.rol.toLowerCase() === 'admin'
+              ? 'Admin'
+              : 'Cliente',
+          fono: backendUser.fono,
+          avatarUri: backendUser.avatarUri,
+          planEndMillis: backendUser.planEndMillis
+        };
+
+        // 3️⃣ Almacenar en el AuthContext
+        login(userForContext);
+
+        // 4️⃣ Navegar según rol
         if (userForContext.role === 'Admin') {
           navigate('/admin');
         } else {
           navigate('/');
         }
+
       } else {
         setError(response?.message || 'Credenciales incorrectas.');
         setLoading(false);
@@ -70,7 +77,7 @@ export const LoginPage = () => {
   return (
     <div className="min-vh-100 d-flex flex-column">
       <NavBar />
-      
+
       <div className={styles.loginPage}>
         <Container>
           <Row className="justify-content-center">
@@ -78,12 +85,14 @@ export const LoginPage = () => {
               <Card className={styles.loginCard}>
                 <Card.Body className="p-4 p-sm-5">
                   <h2 className={styles.cardTitle}>Iniciar Sesión</h2>
-                  
+
                   <Form onSubmit={handleSubmit}>
                     {error && <Alert variant="danger">{error}</Alert>}
 
                     <Form.Group className="mb-3" controlId="loginEmail">
-                      <Form.Label className={styles.formLabel}>Correo Electrónico</Form.Label>
+                      <Form.Label className={styles.formLabel}>
+                        Correo Electrónico
+                      </Form.Label>
                       <Form.Control
                         type="email"
                         placeholder="tu@correo.com"
@@ -95,7 +104,9 @@ export const LoginPage = () => {
                     </Form.Group>
 
                     <Form.Group className="mb-4" controlId="loginPassword">
-                      <Form.Label className={styles.formLabel}>Contraseña</Form.Label>
+                      <Form.Label className={styles.formLabel}>
+                        Contraseña
+                      </Form.Label>
                       <Form.Control
                         type="password"
                         placeholder="Contraseña"
@@ -107,20 +118,33 @@ export const LoginPage = () => {
                     </Form.Group>
 
                     <div className="d-grid">
-                      <button type="submit" className="btn-primary-gradient" disabled={loading}>
+                      <button
+                        type="submit"
+                        className="btn-primary-gradient"
+                        disabled={loading}
+                      >
                         {loading ? (
                           <>
-                            <Spinner as="span" size="sm" role="status" aria-hidden="true" className="me-2"/>
+                            <Spinner
+                              as="span"
+                              size="sm"
+                              role="status"
+                              aria-hidden="true"
+                              className="me-2"
+                            />
                             Entrando...
                           </>
-                        ) : 'Entrar'}
+                        ) : (
+                          'Entrar'
+                        )}
                       </button>
                     </div>
                   </Form>
 
                   <div className="text-center mt-4">
                     <Link to="/registro" className={styles.helperLink}>
-                      ¿No tienes cuenta? <span className="text-primary">Crear una</span>
+                      ¿No tienes cuenta?{' '}
+                      <span className="text-primary">Crear una</span>
                     </Link>
                   </div>
                 </Card.Body>

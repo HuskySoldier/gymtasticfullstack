@@ -1,73 +1,49 @@
+import { getProducts } from './product.service';
+
 export interface Category {
   id: number;
   name: string;
 }
 
-// Simulación de BBDD en memoria. Esta es ahora la "fuente de verdad".
-const mockCategories: Category[] = [
-  { id: 1, name: 'Membresías' },
-  { id: 2, name: 'Suplementos' },
-  { id: 3, name: 'Ropa' },
-  { id: 4, name: 'Equipamiento' },
-];
-
-// Simula un ID autoincremental
-let nextId = 5;
-
 /**
- * Obtiene todas las categorías.
+ * Obtiene las categorías dinámicamente extrayéndolas de los productos existentes.
+ * Cumple el requisito de no usar bases de datos locales.
  */
 export const getCategories = async (): Promise<Category[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([...mockCategories]); // Devuelve una copia
-    }, 200);
-  });
+  try {
+    // 1. Obtenemos los productos reales del backend
+    const response = await getProducts();
+    
+    if (!response.ok) return [];
+
+    // 2. Extraemos las categorías únicas (Set elimina duplicados)
+    const uniqueCategoryNames = [...new Set(response.products.map(p => p.category))];
+
+    // 3. Mapeamos a la interfaz Category
+    return uniqueCategoryNames.map((name, index) => ({
+      id: index + 1,
+      name: name
+    }));
+  } catch (error) {
+    console.error("Error obteniendo categorías dinámicas:", error);
+    return [];
+  }
 };
 
-/**
- * Crea una nueva categoría.
- */
+// --- Métodos "Dummy" para Admin (ya que no hay tabla de categorías) ---
+// Advierten que la gestión depende de los productos.
+
 export const createCategory = async (name: string): Promise<Category> => {
-  return new Promise((resolve) => {
-    const newCategory: Category = { id: nextId++, name };
-    mockCategories.push(newCategory);
-    setTimeout(() => {
-      resolve(newCategory);
-    }, 200);
-  });
+  console.warn("Backend: Crea un producto con esta categoría para que aparezca.");
+  return { id: Date.now(), name };
 };
 
-/**
- * Actualiza una categoría existente.
- */
 export const updateCategory = async (id: number, name: string): Promise<Category | null> => {
-  return new Promise((resolve) => {
-    const index = mockCategories.findIndex(cat => cat.id === id);
-    if (index !== -1) {
-      mockCategories[index].name = name;
-      setTimeout(() => {
-        resolve(mockCategories[index]);
-      }, 200);
-    } else {
-      resolve(null);
-    }
-  });
+  console.warn("Backend: Para renombrar, edita la categoría en los productos.");
+  return { id, name };
 };
 
-/**
- * Elimina una categoría.
- */
 export const deleteCategory = async (id: number): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const index = mockCategories.findIndex(cat => cat.id === id);
-    if (index !== -1) {
-      mockCategories.splice(index, 1);
-      setTimeout(() => {
-        resolve(true);
-      }, 200);
-    } else {
-      resolve(false);
-    }
-  });
+  console.warn(`Backend: Simulando eliminación de cat ${id}. Borra los productos asociados para eliminarla realmente.`);
+  return true;
 };

@@ -1,8 +1,9 @@
+// src/services/product.service.ts
 import type { Product, AllProductsResponse, SingleProductResponse } from '../interfaces/app.interfaces';
 
 const API_URL = 'http://localhost:8081/products';
 
-// --- DEFINICIÓN DE TIPOS DE BACKEND ---
+// Definición de la estructura que viene del Backend
 interface BackendProduct {
   id: number;
   nombre: string;
@@ -13,38 +14,30 @@ interface BackendProduct {
   tipo?: string;
 }
 
-// --- HELPER: Mapear de Backend a Frontend ---
+// Helper para obtener headers con token JWT
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('gym_token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : ''
+  };
+};
+
+// Helper para convertir el formato del Backend al del Frontend
 const mapToFrontend = (data: BackendProduct): Product => {
-  // Definimos el tipo explícito para reutilizarlo si es necesario
   type CategoryType = 'Membresías' | 'Suplementos' | 'Ropa' | 'Equipamiento';
   
   let mappedCategory: CategoryType = 'Suplementos'; 
   let cleanDescription = data.descripcion || '';
 
-  // 1. ESTRATEGIA INTELIGENTE
-  // Usamos 'as const' para que TS sepa que son estos valores exactos y no strings genéricos
   const categories = ['Membresías', 'Suplementos', 'Ropa', 'Equipamiento'] as const;
   
-  let foundTag = false;
-
   for (const cat of categories) {
     const tag = `[${cat}]`;
     if (cleanDescription.startsWith(tag)) {
-      mappedCategory = cat; // ¡Ya no se necesita 'as any'!
-      cleanDescription = cleanDescription.replace(tag, '').trim(); 
-      foundTag = true;
+      mappedCategory = cat;
+      cleanDescription = cleanDescription.replace(tag, '').trim();
       break;
-    }
-  }
-
-  // 2. ESTRATEGIA LEGACY (Respaldo)
-  if (!foundTag) {
-    if (data.tipo?.toLowerCase() === 'plan') {
-      mappedCategory = 'Membresías';
-    } else if (cleanDescription.toLowerCase().includes('ropa') || cleanDescription.toLowerCase().includes('polera') || cleanDescription.toLowerCase().includes('leggings')) {
-      mappedCategory = 'Ropa';
-    } else if (cleanDescription.toLowerCase().includes('mancuerna') || cleanDescription.toLowerCase().includes('peso') || cleanDescription.toLowerCase().includes('barra')) {
-      mappedCategory = 'Equipamiento';
     }
   }
 
@@ -74,7 +67,9 @@ export const getProducts = async (): Promise<AllProductsResponse> => {
 
 export const getProductById = async (id: number): Promise<SingleProductResponse> => {
   try {
-    const response = await fetch(API_URL); 
+    const response = await fetch(API_URL);
+    if(!response.ok) throw new Error("Backend error");
+    
     const data: BackendProduct[] = await response.json();
     const productBackend = data.find((p) => p.id === id);
 
@@ -90,10 +85,10 @@ export const getProductById = async (id: number): Promise<SingleProductResponse>
 
 export const getProductsByCategory = async (categoryName: string): Promise<AllProductsResponse> => {
   try {
-    const response = await getProducts(); 
-    const filtered = response.products.filter(p => {
-        return p.category.toLowerCase() === categoryName.toLowerCase();
-    });
+    const response = await getProducts();
+    const filtered = response.products.filter(p => 
+        p.category.toLowerCase() === categoryName.toLowerCase()
+    );
     return { ok: true, statusCode: 200, products: filtered };
   } catch (error) {
     console.error("Error getting products by category:", error);
@@ -101,13 +96,14 @@ export const getProductsByCategory = async (categoryName: string): Promise<AllPr
   }
 };
 
+// 🔥 Ahora protegido con JWT
 export const createProduct = async (product: Omit<Product, 'id'>): Promise<SingleProductResponse> => {
   try {
     const taggedDescription = `[${product.category}] ${product.description}`;
 
     const backendProduct: Partial<BackendProduct> = {
       nombre: product.name,
-      descripcion: taggedDescription, 
+      descripcion: taggedDescription,
       precio: product.price,
       stock: product.stock === Infinity ? 9999 : product.stock,
       img: product.image,
@@ -116,7 +112,7 @@ export const createProduct = async (product: Omit<Product, 'id'>): Promise<Singl
 
     const response = await fetch(API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(backendProduct)
     });
 
@@ -131,6 +127,7 @@ export const createProduct = async (product: Omit<Product, 'id'>): Promise<Singl
   }
 };
 
+// 🔥 Ahora protegido con JWT
 export const updateProduct = async (id: number, updates: Partial<Product>): Promise<SingleProductResponse> => {
   try {
     const backendUpdates: Partial<BackendProduct> = {};
@@ -138,11 +135,8 @@ export const updateProduct = async (id: number, updates: Partial<Product>): Prom
     if(updates.name) backendUpdates.nombre = updates.name;
     
     if(updates.description || updates.category) {
-       if (updates.category && updates.description) {
-           backendUpdates.descripcion = `[${updates.category}] ${updates.description}`;
-       } else if (updates.description) {
-           backendUpdates.descripcion = updates.description; 
-       }
+      const prefix = updates.category ? `[${updates.category}] ` : '';
+      backendUpdates.descripcion = prefix + (updates.description || '');
     }
 
     if(updates.price) backendUpdates.precio = updates.price;
@@ -151,7 +145,7 @@ export const updateProduct = async (id: number, updates: Partial<Product>): Prom
     
     const response = await fetch(`${API_URL}/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(backendUpdates)
     });
 
@@ -166,9 +160,13 @@ export const updateProduct = async (id: number, updates: Partial<Product>): Prom
   }
 };
 
+// 🔥 Ahora protegido con JWT
 export const deleteProduct = async (id: number): Promise<{ ok: boolean; statusCode: number }> => {
   try {
-    const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    const response = await fetch(`${API_URL}/${id}`, { 
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
     return { ok: response.ok, statusCode: response.status };
   } catch (error) {
     console.error("Error deleting product:", error);
@@ -176,7 +174,22 @@ export const deleteProduct = async (id: number): Promise<{ ok: boolean; statusCo
   }
 };
 
+// 🔥 Ahora protegido con JWT
 export const reduceStock = async (productId: number, quantity: number): Promise<boolean> => {
-  console.log(`(Simulado) Reduciendo stock para ID ${productId}: cantidad ${quantity}`);
-  return true; 
+  try {
+    const payload = {
+      items: [{ productId, qty: quantity }]
+    };
+
+    const response = await fetch(`${API_URL}/decrement-stock`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+
+    return response.ok;
+  } catch (e) {
+    console.error("Error reducing stock:", e);
+    return false;
+  }
 };
