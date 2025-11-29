@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { CartProvider, useCart } from './CartContext';
-import { describe, it, expect } from 'vitest';
+// 1. IMPORTAMOS beforeEach
+import { describe, it, expect, beforeEach } from 'vitest';
 import type { Product } from '../interfaces/app.interfaces';
 
 // Mock de un producto
@@ -15,6 +16,12 @@ const mockProduct: Product = {
 };
 
 describe('CartContext', () => {
+  // 2. COLOCAMOS beforeEach AQUÍ (Nivel del describe, no dentro del it)
+  // Esto asegura que el localStorage esté limpio antes de CADA prueba individual
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('debe iniciar con el carrito vacío', () => {
     // Renderizamos el hook dentro del Provider
     const { result } = renderHook(() => useCart(), {
@@ -51,7 +58,7 @@ describe('CartContext', () => {
     });
 
     expect(result.current.cart).toHaveLength(1); // Sigue siendo 1 item
-    expect(result.current.cart[0].quantity).toBe(3); // Cantidad total 3
+    expect(result.current.cart[0].quantity).toBe(3); // Cantidad total 3 (1 inicial + 2 nuevos)
     expect(result.current.getTotalPrice()).toBe(3000);
   });
 

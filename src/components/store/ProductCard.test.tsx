@@ -65,7 +65,9 @@ describe('ProductCard Component', () => {
       </BrowserRouter>
     );
 
-    const button = screen.getByRole('button', { name: /Agotado/i });
+    // CAMBIO: Busca "Sin Stock" en lugar de "Agotado"
+    const button = screen.getByRole('button', { name: /Sin Stock/i });
+    
     expect(button).toBeDisabled();
   });
 });
