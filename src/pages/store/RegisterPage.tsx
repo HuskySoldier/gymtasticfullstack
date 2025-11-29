@@ -2,168 +2,175 @@ import { useState } from 'react';
 import { Container, Row, Col, Card, Form, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
 import { NavBar } from '../../components/shared/NavBar';
+import { createUser } from '../../services/user.service'; // Asegúrate de importar esto
 import styles from './RegisterPage.module.css';
-import { validateRegistration } from '../../helpers';
-// --- IMPORTAR SERVICIO ---
-import { createUser } from '../../services/user.service';
 
 export const RegisterPage = () => {
-  const [nombre, setNombre] = useState('');
-  const [apellidos, setApellidos] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
   
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState(''); // Para feedback visual antes de redirigir
   
   const navigate = useNavigate();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
-    setSuccessMsg('');
+    setSuccess('');
     setLoading(true);
 
-    // 1. Validación local (Frontend)
-    const validationResult = validateRegistration({
-      nombre,
-      apellidos,
-      email,
-      password,
-      confirmPassword
-    });
+    // Validaciones básicas
+    if (!formData.nombre || !formData.email || !formData.password || !formData.confirmPassword) {
+      setError('Todos los campos son obligatorios.');
+      setLoading(false);
+      return;
+    }
 
-    if (!validationResult.isValid) {
-      setError(validationResult.message || 'Error de validación.');
+    if (formData.password !== formData.confirmPassword) {
+      setError('Las contraseñas no coinciden.');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres.');
       setLoading(false);
       return;
     }
 
     try {
-      // 2. Llamada al Backend (Register Service)
-      // El servicio real ya devuelve una promesa o lanza error
+      // Llamada al servicio real (Backend)
       await createUser({
-        name: `${nombre.trim()} ${apellidos.trim()}`, // Unimos nombre y apellido para el campo 'name' del front
-        email: email.trim(),
-        password: password,
-        role: 'Cliente' // Rol por defecto
+        name: formData.nombre,
+        email: formData.email,
+        password: formData.password,
+        role: 'Cliente' // Por defecto
       });
       
-      setSuccessMsg('¡Cuenta creada con éxito! Redirigiendo al login...');
+      setSuccess('¡Cuenta creada con éxito! Redirigiendo al login...');
       
-      // 3. Redirigir al Login tras 1.5 segundos para que el usuario lea el mensaje
+      // Redirigir después de 2 segundos
       setTimeout(() => {
         navigate('/login');
-      }, 1500);
+      }, 2000);
 
-} catch (err) {
-      console.error("Error en registro:", err);
-      // Verificamos si 'err' es un objeto Error estándar para acceder a .message
-      const errorMessage = (err instanceof Error) 
-        ? err.message 
-        : "Error al registrar el usuario. Inténtalo más tarde.";
-        
-      setError(errorMessage);
+    } catch (err: unknown) {
+      console.error(err);
+      if (err instanceof Error) {
+        setError(err.message || 'Error al registrar el usuario.');
+      } else {
+        setError(String(err) || 'Error al registrar el usuario.');
+      }
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-vh-100 d-flex flex-column">
+    <div className="d-flex flex-column min-vh-100 bg-dark">
       <NavBar />
       
       <div className={styles.registerPage}>
         <Container>
           <Row className="justify-content-center">
-            <Col md={7} lg={6} xl={5}>
+            <Col md={8} lg={6} xl={5}>
               <Card className={styles.registerCard}>
                 <Card.Body className="p-4 p-sm-5">
-                  <h2 className={styles.cardTitle}>Crear Cuenta</h2>
+                  <div className="text-center mb-4">
+                    <i className="fa-solid fa-user-plus fa-3x text-primary mb-3"></i>
+                    <h2 className={styles.cardTitle}>Crear Cuenta</h2>
+                    {/* Texto en blanco para mejor contraste */}
+                    <p className="text-white small">Únete a la comunidad Gymtastic</p>
+                  </div>
                   
                   <Form onSubmit={handleSubmit}>
-                    {error && <Alert variant="danger">{error}</Alert>}
-                    {successMsg && <Alert variant="success">{successMsg}</Alert>}
+                    {error && <Alert variant="danger" className="py-2 text-center small">{error}</Alert>}
+                    {success && <Alert variant="success" className="py-2 text-center small">{success}</Alert>}
+
+                    <Form.Group className="mb-3" controlId="regNombre">
+                      <Form.Label className={styles.formLabel}>Nombre Completo</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="nombre"
+                        placeholder="Tu nombre"
+                        className={styles.formInput}
+                        value={formData.nombre}
+                        onChange={handleChange}
+                        disabled={loading}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="regEmail">
+                      <Form.Label className={styles.formLabel}>Correo Electrónico</Form.Label>
+                      <Form.Control
+                        type="email"
+                        name="email"
+                        placeholder="tu@correo.com"
+                        className={styles.formInput}
+                        value={formData.email}
+                        onChange={handleChange}
+                        disabled={loading}
+                      />
+                    </Form.Group>
 
                     <Row>
                       <Col md={6}>
-                        <Form.Group className="mb-3" controlId="registerNombre">
-                          <Form.Label className={styles.formLabel}>Nombre</Form.Label>
+                        <Form.Group className="mb-3" controlId="regPass">
+                          <Form.Label className={styles.formLabel}>Contraseña</Form.Label>
                           <Form.Control
-                            type="text"
-                            placeholder="Tu nombre"
+                            type="password"
+                            name="password"
+                            placeholder="******"
                             className={styles.formInput}
-                            value={nombre}
-                            onChange={(e) => setNombre(e.target.value)}
+                            value={formData.password}
+                            onChange={handleChange}
                             disabled={loading}
                           />
                         </Form.Group>
                       </Col>
                       <Col md={6}>
-                        <Form.Group className="mb-3" controlId="registerApellidos">
-                          <Form.Label className={styles.formLabel}>Apellidos</Form.Label>
+                        <Form.Group className="mb-4" controlId="regConfirmPass">
+                          <Form.Label className={styles.formLabel}>Confirmar</Form.Label>
                           <Form.Control
-                            type="text"
-                            placeholder="Tus apellidos"
+                            type="password"
+                            name="confirmPassword"
+                            placeholder="******"
                             className={styles.formInput}
-                            value={apellidos}
-                            onChange={(e) => setApellidos(e.target.value)}
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
                             disabled={loading}
                           />
                         </Form.Group>
                       </Col>
                     </Row>
 
-                    <Form.Group className="mb-3" controlId="registerEmail">
-                      <Form.Label className={styles.formLabel}>Correo Electrónico</Form.Label>
-                      <Form.Control
-                        type="email"
-                        placeholder="tu@correo.com"
-                        className={styles.formInput}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={loading}
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-3" controlId="registerPassword">
-                      <Form.Label className={styles.formLabel}>Contraseña</Form.Label>
-                      <Form.Control
-                        type="password"
-                        placeholder="Mínimo 6 caracteres"
-                        className={styles.formInput}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={loading}
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-4" controlId="registerConfirmPassword">
-                      <Form.Label className={styles.formLabel}>Confirmar Contraseña</Form.Label>
-                      <Form.Control
-                        type="password"
-                        placeholder="Confirma tu contraseña"
-                        className={styles.formInput}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        disabled={loading}
-                      />
-                    </Form.Group>
-
-                    <div className="d-grid">
-                      <button type="submit" className="btn-primary-gradient" disabled={loading}>
+                    <div className="d-grid gap-2">
+                      <button type="submit" className="btn btn-primary btn-lg fw-bold" disabled={loading}>
                         {loading ? (
-                            <>
-                                <Spinner as="span" size="sm" role="status" aria-hidden="true" className="me-2"/>
-                                Registrando...
-                            </>
-                        ) : 'Registrarse'}
+                          <>
+                            <Spinner as="span" size="sm" role="status" aria-hidden="true" className="me-2"/>
+                            Registrando...
+                          </>
+                        ) : 'REGISTRARME'}
                       </button>
                     </div>
                   </Form>
 
                   <div className="text-center mt-4">
                     <Link to="/login" className={styles.helperLink}>
-                      ¿Ya tienes cuenta? <span className="text-primary">Iniciar Sesión</span>
+                      ¿Ya tienes cuenta? <span className="text-primary">Inicia Sesión</span>
                     </Link>
                   </div>
                 </Card.Body>

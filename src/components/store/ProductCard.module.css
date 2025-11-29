@@ -1,29 +1,23 @@
-/*
-  Estilos modulares (locales) SOLO para ProductCard.
-  Estas clases NO afectarán a ningún otro componente.
-*/
-
+/* src/components/store/ProductCard.module.css */
 .card {
-  /* Fondo blanco y sombra ya no están en línea */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra un poco más fuerte para fondo oscuro */
   transition: all 0.3s ease;
-  border: none; /* Quitamos el borde por defecto */
+  overflow: hidden; /* Para que la imagen respete los bordes */
 }
 
 .card:hover {
-  /* Un efecto profesional al pasar el mouse */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
   transform: translateY(-5px);
 }
 
 .cardImage {
-  height: 300px;
+  height: 250px; /* Altura fija para uniformidad */
+  width: 100%;
   object-fit: cover;
-  border-radius: 0.375rem 0.375rem 0 0; /* Redondeamos solo las esquinas superiores */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .description {
-  font-size: 0.95rem;
-  color: #6c757d; /* Un gris sutil para la descripción */
-  min-height: 60px; /* Evita que las tarjetas "salten" si tienen descripciones de 1 o 2 líneas */
+  font-size: 0.9rem;
+  line-height: 1.5;
 }

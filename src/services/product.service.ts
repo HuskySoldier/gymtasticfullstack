@@ -54,15 +54,19 @@ const mapToFrontend = (data: BackendProduct): Product => {
     }
   }
 
+  
   return {
     id: data.id,
     name: data.nombre,
     description: cleanDescription,
-    image: (data.img && data.img.startsWith('http')) ? data.img : 'https://source.unsplash.com/random?gym',
+    // CAMBIO AQUÍ: Ahora aceptamos rutas que empiecen con 'http' O con '/'
+    image: (data.img && (data.img.startsWith('http') || data.img.startsWith('/'))) 
+            ? data.img 
+            : 'https://source.unsplash.com/random?gym', // Fallback si no hay imagen válida
     price: data.precio,
     stock: (data.stock === null || data.stock === undefined) ? Infinity : data.stock,
     category: mappedCategory
-  };
+  }
 };
 
 // --- MÉTODOS PÚBLICOS (Lectura) ---

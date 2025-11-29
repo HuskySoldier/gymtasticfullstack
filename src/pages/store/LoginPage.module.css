@@ -1,53 +1,65 @@
+/* src/pages/store/LoginPage.module.css */
+
 .loginPage {
-  /* Usamos min-height para centrar verticalmente, restando la altura del navbar (aprox 70px) */
-  min-height: calc(100vh - 70px); 
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)),
+              url('https://source.unsplash.com/1600x900/?gym,fitness,dark') no-repeat center center;
+  background-size: cover;
+  min-height: calc(100vh - 76px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem 0;
-  background-color: var(--gym-light); /* Fondo claro de la página */
 }
 
 .loginCard {
-  background-color: var(--gym-dark); /* Tarjeta oscura, como el NavBar/Footer */
-  color: var(--gym-light);
+  background-color: rgba(33, 37, 41, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  color: white; /* Texto base blanco */
+  border-radius: 1rem;
 }
 
 .cardTitle {
   text-align: center;
-  font-size: 2.5rem;
-  color: var(--gym-primary); /* Color dorado de marca */
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gym-primary, #ff3e3e);
+  letter-spacing: 1px;
 }
 
+/* --- CAMBIO: ETIQUETAS BLANCAS --- */
 .formLabel {
-  color: var(--gym-text-secondary);
   font-weight: 500;
+  color: white; /* Antes era gris */
 }
 
 .formInput {
-  background-color: #2a2a2a; /* Un poco más claro que el fondo */
-  border: 1px solid #444;
-  color: var(--gym-light);
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid #495057;
+  color: white !important;
   padding: 0.75rem 1rem;
 }
+
 .formInput:focus {
-  background-color: #2a2a2a;
-  color: var(--gym-light);
-  border-color: var(--gym-primary);
-  box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+  background-color: rgba(0, 0, 0, 0.4);
+  border-color: var(--gym-primary, #ff3e3e);
+  box-shadow: 0 0 0 0.25rem rgba(255, 62, 62, 0.25);
+  color: white;
 }
 
-/* Para el texto de "Crear cuenta" y "Olvidé contraseña" */
+/* --- CAMBIO: LINKS BLANCOS --- */
 .helperLink {
-  color: var(--gym-text-secondary);
+  color: white; /* Antes era gris */
   text-decoration: none;
   font-size: 0.9rem;
-  transition: color 0.2s ease;
+  transition: color 0.3s ease;
 }
+
 .helperLink:hover {
-  color: var(--gym-primary);
+  color: var(--gym-primary, #ff3e3e);
+}
+
+.helperLink span {
+  font-weight: bold;
 }
